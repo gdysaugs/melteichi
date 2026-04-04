@@ -1106,7 +1106,6 @@ export function Video() {
                           <input type="file" accept="image/*" onChange={handleFileChange} />
                           <div className="studio-upload-inner">
                             <strong>{sourceName || '元画像をアップロード'}</strong>
-                            <span>推奨: 縦832x576以内、横576x832以内</span>
                           </div>
                         </label>
                         {sourcePreview && (
