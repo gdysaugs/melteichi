@@ -10,6 +10,7 @@ const OAUTH_REDIRECT_URL =
   import.meta.env.VITE_SUPABASE_REDIRECT_URL ?? (typeof window !== 'undefined' ? window.location.origin : undefined)
 const DAILY_BONUS_COOLDOWN_HOURS = 24
 const DAILY_BONUS_AMOUNT = 3
+const PURCHASE_CHAT_ICON = '/apple-touch-icon.png'
 
 const formatRemaining = (targetIso: string | null) => {
   if (!targetIso) return ''
@@ -338,6 +339,10 @@ export function Purchase() {
                   </div>
                   <span className={`token-bonus-state ${dailyCanClaim ? 'is-ready' : ''}`}>{dailyBonusHint}</span>
                 </div>
+                <div className="token-guide-comment token-guide-comment--daily" aria-label="デイリー配布ガイド">
+                  <img className="token-guide-comment__avatar" src={PURCHASE_CHAT_ICON} alt="" aria-hidden="true" />
+                  <p className="token-guide-comment__bubble">{`ここから毎日${DAILY_BONUS_AMOUNT}ポイントを受け取れます！`}</p>
+                </div>
                 <div className="token-bonus-card__actions">
                   <button
                     type="button"
@@ -361,6 +366,10 @@ export function Purchase() {
               </div>
               <span className="token-pill">カード決済</span>
             </div>
+            <div className="token-guide-comment" aria-label="購入ガイド">
+              <img className="token-guide-comment__avatar" src={PURCHASE_CHAT_ICON} alt="" aria-hidden="true" />
+              <p className="token-guide-comment__bubble">ここからポイントを購入できます！</p>
+            </div>
             <div className="token-plan-grid">
               {PURCHASE_PLANS.map((plan) => {
                 const unitPrice = plan.price / plan.tickets
@@ -381,7 +390,7 @@ export function Purchase() {
                     </div>
                     <div className="token-plan__price-row">
                       <div className="token-plan__price">¥{plan.price.toLocaleString()}</div>
-                      <div className="token-plan__unit">{`1ptあたり約 ¥${unitPriceDisplay}`}</div>
+                      <div className="token-plan__unit">{`1ptあたり約 ${unitPriceDisplay}円`}</div>
                     </div>
                     <button
                       type="button"
@@ -400,6 +409,34 @@ export function Purchase() {
                 {purchaseMessage}
               </p>
             )}
+          </article>
+        </section>
+
+        <section className="token-tips" aria-label="使い方のコツ">
+          <h3 className="token-tips__title">使い方のコツ</h3>
+
+          <article className="token-tips__item">
+            <img className="token-tips__avatar" src={PURCHASE_CHAT_ICON} alt="" aria-hidden="true" />
+            <div className="token-tips__bubble">
+              <h4>プロンプトのコツ</h4>
+              <ul>
+                <li>「場面転換」と書くと、次の動きに切り替わりやすいです。</li>
+                <li>英語プロンプトが最も通りやすいです。</li>
+                <li>詳しく書くほど、動きの再現が正確になります。</li>
+              </ul>
+            </div>
+          </article>
+
+          <article className="token-tips__item">
+            <img className="token-tips__avatar" src={PURCHASE_CHAT_ICON} alt="" aria-hidden="true" />
+            <div className="token-tips__bubble">
+              <h4>効果音のコツ</h4>
+              <ul>
+                <li>効果音は英語入力がおすすめです。</li>
+                <li>シンプルな単語だけでもOKです。例: <code>wind</code></li>
+                <li>効果音は動画の動きに合わせて再生されます。</li>
+              </ul>
+            </div>
           </article>
         </section>
 

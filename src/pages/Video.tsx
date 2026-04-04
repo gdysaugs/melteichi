@@ -55,8 +55,6 @@ const parseVideoModel = (value: string | null): VideoModel => {
 const FIXED_STEPS = 4
 const FIXED_CFG = 1
 const FIXED_FPS = 10
-const MAX_SPEECH_TEXT_LENGTH = 100
-const MAX_VOICE_DESIGN_LENGTH = 300
 const MAX_SFX_PROMPT_LENGTH = 500
 const CHAT_AVATAR_ICON = '/apple-touch-icon.png'
 const MIX_EXPORT_MIME_CANDIDATES = [
@@ -68,60 +66,6 @@ const VIDEO_LENGTH_OPTIONS = [
   { seconds: 5, frames: 53, ticketCost: 1, label: '5秒 (1ポイント)' },
   { seconds: 7, frames: 73, ticketCost: 2, label: '7秒 (2ポイント)' },
   { seconds: 10, frames: 101, ticketCost: 3, label: '10秒 (3ポイント)' },
-] as const
-const EMOJI_MANUAL_GROUPS = [
-  {
-    title: '音声演出',
-    items: [
-      ['🤫', '囁き、耳元の音'],
-      ['😮‍💨', '吐息、溜息、寝息'],
-      ['⏸️', '間、沈黙'],
-      ['😂', '笑い（くすくす、含み笑い）'],
-      ['😮', '息をのむ'],
-      ['😋', '舐める音、哀嚎音、水音'],
-      ['👄', 'リップノイズ'],
-      ['📞', '電話越し・スピーカー越し風'],
-    ],
-  },
-  {
-    title: '感情表現',
-    items: [
-      ['😢', '嗚咽、泣き声、悲しみ'],
-      ['😱', '悲鳴、叫び、絶叫'],
-      ['😡', '怒り、不満げ'],
-      ['😯', '驚き、感嘆'],
-      ['🥺', '懇願するように'],
-      ['😳', '恥ずかしそうに、照れながら'],
-      ['🙄', '呆れたように'],
-      ['😌', '安堵、満足げに'],
-    ],
-  },
-  {
-    title: '話し方・トーン',
-    items: [
-      ['😏', 'からかうように、甘えるように'],
-      ['😊', '優しく'],
-      ['😴', '眠そうに、気だるげに'],
-      ['💫', '声を震わせながら、自信なさげに'],
-      ['😮‍💨', '息切れ、荒い息遣い'],
-      ['😮‍💧', '慌てて、動揺、緊張、どもり'],
-      ['🤯', '酔っ払って'],
-      ['🤔', '疑問の声'],
-    ],
-  },
-  {
-    title: '速度・リズム',
-    items: [
-      ['⏩', '早口、一気にまくしたてる'],
-      ['🐢', 'ゆっくりと'],
-      ['👍', '相槌、頷く音'],
-      ['🎵', '鼻歌'],
-      ['🤐', '口を塞がれているような声'],
-      ['🤧', '咳込み、鼻をすする、くしゃみ'],
-      ['🥱', 'あくび'],
-      ['😞', '苦しげに'],
-    ],
-  },
 ] as const
 const DEFAULT_VIDEO_LENGTH_SECONDS = VIDEO_LENGTH_OPTIONS[0].seconds
 const resolveVideoLengthOption = (seconds: number) =>
@@ -274,45 +218,6 @@ const extractVideo = (payload: any) => {
   return null
 }
 
-const extractAudio = (payload: any) => {
-  const roots = [
-    payload,
-    payload?.output,
-    payload?.result,
-    payload?.output?.output,
-    payload?.result?.output,
-    payload?.output?.result,
-    payload?.result?.result,
-  ]
-
-  for (const root of roots) {
-    if (!root || typeof root !== 'object') continue
-
-    if (typeof root.audio_base64 === 'string' && root.audio_base64) {
-      const mime = typeof root.audio_mime === 'string' && root.audio_mime ? root.audio_mime : 'audio/wav'
-      return `data:${mime};base64,${root.audio_base64}`
-    }
-
-    const audioObj = root.audio
-    if (typeof audioObj === 'string' && audioObj) {
-      if (audioObj.startsWith('data:audio/')) return audioObj
-      return `data:audio/wav;base64,${audioObj}`
-    }
-
-    if (audioObj && typeof audioObj === 'object') {
-      const base64 = audioObj.base64 ?? audioObj.data ?? audioObj.audio_base64
-      if (typeof base64 === 'string' && base64) {
-        const mime = typeof audioObj.mime === 'string' && audioObj.mime ? audioObj.mime : 'audio/wav'
-        return `data:${mime};base64,${base64}`
-      }
-      const url = audioObj.url ?? audioObj.audio_url
-      if (typeof url === 'string' && url.startsWith('data:audio/')) return url
-    }
-  }
-
-  return null
-}
-
 const extractErrorMessage = (payload: any) =>
   payload?.error ||
   payload?.message ||
@@ -429,8 +334,6 @@ export function Video() {
   const [sourcePayload, setSourcePayload] = useState<string | null>(null)
   const [sourceName, setSourceName] = useState('')
   const [prompt, setPrompt] = useState('')
-  const [speechText, setSpeechText] = useState('')
-  const [voiceDesign, setVoiceDesign] = useState('')
   const [sfxPrompt, setSfxPrompt] = useState('')
   const [negativePrompt, setNegativePrompt] = useState('')
   const [videoLengthSeconds, setVideoLengthSeconds] = useState<VideoLengthSeconds>(DEFAULT_VIDEO_LENGTH_SECONDS as VideoLengthSeconds)
@@ -457,7 +360,7 @@ export function Video() {
   const accessToken = session?.access_token ?? ''
   const selectedVideoModel = VIDEO_MODELS[videoModel] ?? VIDEO_MODELS[DEFAULT_VIDEO_MODEL]
   const selectedVideoLength = useMemo(() => resolveVideoLengthOption(videoLengthSeconds), [videoLengthSeconds])
-  const speechMixSupported = useMemo(() => {
+  const mediaMixSupported = useMemo(() => {
     if (typeof window === 'undefined') return false
     const hasMediaRecorder = typeof window.MediaRecorder !== 'undefined'
     const hasCaptureStream =
@@ -465,26 +368,18 @@ export function Video() {
       typeof (HTMLVideoElement.prototype as CapturableVideoElement).captureStream === 'function'
     return hasMediaRecorder && hasCaptureStream
   }, [])
-  const hasSpeechText = speechText.trim().length > 0
   const hasSfxPrompt = sfxPrompt.trim().length > 0
-  const shouldRunSpeechPipeline = hasSpeechText && speechMixSupported
-  const audioPipelineCost = shouldRunSpeechPipeline || hasSfxPrompt ? 1 : 0
+  const audioPipelineCost = hasSfxPrompt ? 1 : 0
   const requiredPoints = selectedVideoLength.ticketCost + audioPipelineCost
   const requiredPointsForRun = requiredPoints
   const canGenerate = Boolean(sourcePayload && prompt.trim() && !isRunning && session)
   const isGif = displayVideo?.startsWith('data:image/gif')
   const loadingSubtitle = useMemo(() => {
-    if (shouldRunSpeechPipeline && hasSfxPrompt) {
-      return '動画生成 → 効果音生成 → セリフ音声生成 → 合成を順番に実行中です。'
-    }
-    if (shouldRunSpeechPipeline) {
-      return '動画生成 → セリフ音声生成 → 合成を実行中です。'
-    }
     if (hasSfxPrompt) {
       return '動画生成 → 効果音生成を実行中です。'
     }
     return '動画生成を実行中です。'
-  }, [hasSfxPrompt, shouldRunSpeechPipeline])
+  }, [hasSfxPrompt])
 
   const viewerStyle = useMemo(
     () =>
@@ -585,7 +480,7 @@ export function Video() {
   const goToNextStep = useCallback(() => {
     setChatStep((prev) => {
       if (!canProceedStep(prev)) return prev
-      return Math.min(prev + 1, 6)
+      return Math.min(prev + 1, 5)
     })
     if (typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches) {
       const active = (typeof document !== 'undefined' ? document.activeElement : null) as HTMLElement | null
@@ -830,240 +725,141 @@ export function Video() {
     throw new Error('効果音付き動画の生成がタイムアウトしました。')
   }, [accessToken])
 
-  const runSpeechPipeline = useCallback(async (text: string, voiceDesignText: string, runId: number, pipelineUsageId?: string) => {
-    const speechInput: Record<string, unknown> = {
-      text,
-      model_variant: 'voicedesign',
-      seconds: 20,
-      num_steps: 40,
-    }
-    if (voiceDesignText.trim()) {
-      speechInput.reference_text = voiceDesignText.trim()
-    }
-    if (pipelineUsageId) {
-      speechInput.pipeline_usage_id = pipelineUsageId
-    }
-
-    const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (accessToken) {
-      authHeaders.Authorization = `Bearer ${accessToken}`
-    }
-
-    const res = await fetch('/api/irodori', {
-      method: 'POST',
-      headers: authHeaders,
-      body: JSON.stringify({
-        input: speechInput,
-      }),
-    })
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      const message = normalizeErrorMessage(extractErrorMessage(data) || '音声生成の開始に失敗しました。')
-      if (isTicketShortage(res.status, message)) {
-        setShowTicketModal(true)
-        setStatusMessage('ポイントが不足しています。')
-        throw new Error('TICKET_SHORTAGE')
-      }
-      throw new Error(message)
-    }
-
-    const immediateAudio = extractAudio(data)
-    if (immediateAudio) return immediateAudio
-
-    const jobId = extractJobId(data)
-    if (!jobId) {
-      throw new Error('音声生成のジョブIDを取得できませんでした。')
-    }
-
-    for (let i = 0; i < 180; i += 1) {
-      if (runIdRef.current !== runId) return null
-      const pollRes = await fetch(`/api/irodori?id=${encodeURIComponent(String(jobId))}${pipelineUsageId ? `&pipeline_usage_id=${encodeURIComponent(pipelineUsageId)}` : ``}`, {
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      })
-      const pollData = await pollRes.json().catch(() => ({}))
-      if (!pollRes.ok) {
-        const message = normalizeErrorMessage(extractErrorMessage(pollData) || '音声生成の状態確認に失敗しました。')
-        if (isTicketShortage(pollRes.status, message)) {
-          setShowTicketModal(true)
-          setStatusMessage('ポイントが不足しています。')
-          throw new Error('TICKET_SHORTAGE')
-        }
-        throw new Error(message)
-      }
-
-      const maybeAudio = extractAudio(pollData)
-      if (maybeAudio) return maybeAudio
-
-      const status = String(pollData?.status || pollData?.state || '').toLowerCase()
-      if (isFailureStatus(status)) {
-        throw new Error(normalizeErrorMessage(extractErrorMessage(pollData) || `音声生成に失敗しました: ${status}`))
-      }
-      await wait(2500)
-    }
-
-    throw new Error('音声生成がタイムアウトしました。')
-  }, [accessToken])
-
   const mixVideoWithAudioTracks = useCallback(
     async (
       videoSource: string,
       runId: number,
       options?: {
-        speechAudioDataUrl?: string | null
         fxAudioVideoSource?: string | null
         targetSeconds?: number
       },
     ) => {
-      const speechAudioDataUrl = options?.speechAudioDataUrl ?? null
       const fxAudioVideoSource = options?.fxAudioVideoSource ?? null
       const targetSeconds = options?.targetSeconds
       const videoDataUrl = await sourceToDataUrl(videoSource)
       const fxAudioVideoDataUrl =
         fxAudioVideoSource && fxAudioVideoSource !== videoSource ? await sourceToDataUrl(fxAudioVideoSource) : null
-    if (runIdRef.current !== runId) return null
+      if (runIdRef.current !== runId) return null
 
-    const videoEl = document.createElement('video')
-    videoEl.src = videoDataUrl
-    videoEl.preload = 'auto'
-    videoEl.muted = true
-    videoEl.playsInline = true
+      const videoEl = document.createElement('video')
+      videoEl.src = videoDataUrl
+      videoEl.preload = 'auto'
+      videoEl.muted = true
+      videoEl.playsInline = true
 
-    const fxAudioEl = fxAudioVideoDataUrl ? document.createElement('video') : null
-    if (fxAudioEl && fxAudioVideoDataUrl) {
-      fxAudioEl.src = fxAudioVideoDataUrl
-      fxAudioEl.preload = 'auto'
-      fxAudioEl.muted = false
-      fxAudioEl.playsInline = true
-    }
-
-    const speechEl = speechAudioDataUrl ? document.createElement('audio') : null
-    if (speechEl) {
-      speechEl.src = speechAudioDataUrl
-      speechEl.preload = 'auto'
-    }
-
-    const metadataTasks: Promise<void>[] = [
-      new Promise<void>((resolve, reject) => {
-        videoEl.onloadedmetadata = () => resolve()
-        videoEl.onerror = () => reject(new Error('動画メタデータの読み込みに失敗しました。'))
-      }),
-    ]
-    if (speechEl) {
-      metadataTasks.push(
-        new Promise<void>((resolve, reject) => {
-          speechEl.onloadedmetadata = () => resolve()
-          speechEl.onerror = () => reject(new Error('音声メタデータの読み込みに失敗しました。'))
-        }),
-      )
-    }
-    if (fxAudioEl) {
-      metadataTasks.push(
-        new Promise<void>((resolve, reject) => {
-          fxAudioEl.onloadedmetadata = () => resolve()
-          fxAudioEl.onerror = () => reject(new Error('効果音動画メタデータの読み込みに失敗しました。'))
-        }),
-      )
-    }
-    await Promise.all(metadataTasks)
-
-    const sourceWidth = Math.max(2, Math.floor(videoEl.videoWidth || 0))
-    const sourceHeight = Math.max(2, Math.floor(videoEl.videoHeight || 0))
-    if (!sourceWidth || !sourceHeight) {
-      throw new Error('動画サイズを取得できませんでした。')
-    }
-
-    const capturableVideoEl = videoEl as CapturableVideoElement
-    if (typeof capturableVideoEl.captureStream !== 'function') {
-      throw new Error('このブラウザは最終合成に対応していません。')
-    }
-
-    // Force element display size to intrinsic size before capture to avoid accidental downscale/crop.
-    videoEl.width = sourceWidth
-    videoEl.height = sourceHeight
-    videoEl.style.width = `${sourceWidth}px`
-    videoEl.style.height = `${sourceHeight}px`
-
-    const sourceStream = capturableVideoEl.captureStream(FIXED_FPS)
-    const videoTrack = sourceStream.getVideoTracks()[0]
-    if (!videoTrack) {
-      throw new Error('動画トラックを取得できませんでした。')
-    }
-
-    const audioContext = new AudioContext()
-    const destination = audioContext.createMediaStreamDestination()
-    const videoSourceNode = audioContext.createMediaElementSource(videoEl)
-    const videoGain = audioContext.createGain()
-    videoGain.gain.value = 1
-    if (speechEl) {
-      const speechSourceNode = audioContext.createMediaElementSource(speechEl)
-      const speechGain = audioContext.createGain()
-      speechGain.gain.value = 1
-      speechSourceNode.connect(speechGain).connect(destination)
-    }
-    if (fxAudioEl) {
-      const fxSourceNode = audioContext.createMediaElementSource(fxAudioEl)
-      const fxGain = audioContext.createGain()
-      fxGain.gain.value = 1
-      fxSourceNode.connect(fxGain).connect(destination)
-    } else {
-      videoSourceNode.connect(videoGain).connect(destination)
-    }
-
-    const mixedStream = new MediaStream()
-    mixedStream.addTrack(videoTrack)
-    const mixedAudioTrack = destination.stream.getAudioTracks()[0]
-    if (mixedAudioTrack) {
-      mixedStream.addTrack(mixedAudioTrack)
-    }
-
-    const mimeType = MIX_EXPORT_MIME_CANDIDATES.find((item) => MediaRecorder.isTypeSupported(item)) ?? 'video/webm'
-    const recorder = new MediaRecorder(mixedStream, { mimeType, videoBitsPerSecond: 8_000_000 })
-    const chunks: BlobPart[] = []
-
-    const stopPromise = new Promise<void>((resolve, reject) => {
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunks.push(event.data)
+      const fxAudioEl = fxAudioVideoDataUrl ? document.createElement('video') : null
+      if (fxAudioEl && fxAudioVideoDataUrl) {
+        fxAudioEl.src = fxAudioVideoDataUrl
+        fxAudioEl.preload = 'auto'
+        fxAudioEl.muted = false
+        fxAudioEl.playsInline = true
       }
-      recorder.onstop = () => resolve()
-      recorder.onerror = () => reject(new Error('最終動画の録画に失敗しました。'))
-    })
 
-    recorder.start(1000)
-    await audioContext.resume()
-    videoEl.currentTime = 0
-    if (speechEl) speechEl.currentTime = 0
-    if (fxAudioEl) fxAudioEl.currentTime = 0
-    const playTasks: Promise<unknown>[] = [videoEl.play()]
-    if (speechEl) playTasks.push(speechEl.play())
-    if (fxAudioEl) playTasks.push(fxAudioEl.play())
-    await Promise.allSettled(playTasks)
-
-    await new Promise<void>((resolve) => {
-      const requestedDurationMs =
-        typeof targetSeconds === 'number' && Number.isFinite(targetSeconds) && targetSeconds > 0
-          ? Math.floor(targetSeconds * 1000)
-          : null
-      const naturalDurationMs = Number.isFinite(videoEl.duration) ? Math.floor(videoEl.duration * 1000) : null
-      const stopAfterMs = Math.max(1000, requestedDurationMs ?? naturalDurationMs ?? 15000)
-      const timer = window.setTimeout(resolve, stopAfterMs)
-      videoEl.onended = () => {
-        window.clearTimeout(timer)
-        resolve()
+      const metadataTasks: Promise<void>[] = [
+        new Promise<void>((resolve, reject) => {
+          videoEl.onloadedmetadata = () => resolve()
+          videoEl.onerror = () => reject(new Error('動画メタデータの読み込みに失敗しました。'))
+        }),
+      ]
+      if (fxAudioEl) {
+        metadataTasks.push(
+          new Promise<void>((resolve, reject) => {
+            fxAudioEl.onloadedmetadata = () => resolve()
+            fxAudioEl.onerror = () => reject(new Error('効果音動画メタデータの読み込みに失敗しました。'))
+          }),
+        )
       }
-    })
+      await Promise.all(metadataTasks)
 
-    if (speechEl) speechEl.pause()
-    videoEl.pause()
-    if (fxAudioEl) fxAudioEl.pause()
-    if (recorder.state !== 'inactive') recorder.stop()
-    await stopPromise
+      const sourceWidth = Math.max(2, Math.floor(videoEl.videoWidth || 0))
+      const sourceHeight = Math.max(2, Math.floor(videoEl.videoHeight || 0))
+      if (!sourceWidth || !sourceHeight) {
+        throw new Error('動画サイズを取得できませんでした。')
+      }
 
-    sourceStream.getTracks().forEach((track: MediaStreamTrack) => track.stop())
-    mixedStream.getTracks().forEach((track: MediaStreamTrack) => track.stop())
-    await audioContext.close().catch(() => undefined)
+      const capturableVideoEl = videoEl as CapturableVideoElement
+      if (typeof capturableVideoEl.captureStream !== 'function') {
+        throw new Error('このブラウザは最終合成に対応していません。')
+      }
 
-    const mixedBlob = new Blob(chunks, { type: mimeType })
-    return URL.createObjectURL(mixedBlob)
+      // Force element display size to intrinsic size before capture to avoid accidental downscale/crop.
+      videoEl.width = sourceWidth
+      videoEl.height = sourceHeight
+      videoEl.style.width = `${sourceWidth}px`
+      videoEl.style.height = `${sourceHeight}px`
+
+      const sourceStream = capturableVideoEl.captureStream(FIXED_FPS)
+      const videoTrack = sourceStream.getVideoTracks()[0]
+      if (!videoTrack) {
+        throw new Error('動画トラックを取得できませんでした。')
+      }
+
+      const audioContext = new AudioContext()
+      const destination = audioContext.createMediaStreamDestination()
+      const videoSourceNode = audioContext.createMediaElementSource(videoEl)
+      const videoGain = audioContext.createGain()
+      videoGain.gain.value = 1
+      if (fxAudioEl) {
+        const fxSourceNode = audioContext.createMediaElementSource(fxAudioEl)
+        const fxGain = audioContext.createGain()
+        fxGain.gain.value = 1
+        fxSourceNode.connect(fxGain).connect(destination)
+      } else {
+        videoSourceNode.connect(videoGain).connect(destination)
+      }
+
+      const mixedStream = new MediaStream()
+      mixedStream.addTrack(videoTrack)
+      const mixedAudioTrack = destination.stream.getAudioTracks()[0]
+      if (mixedAudioTrack) {
+        mixedStream.addTrack(mixedAudioTrack)
+      }
+
+      const mimeType = MIX_EXPORT_MIME_CANDIDATES.find((item) => MediaRecorder.isTypeSupported(item)) ?? 'video/webm'
+      const recorder = new MediaRecorder(mixedStream, { mimeType, videoBitsPerSecond: 8_000_000 })
+      const chunks: BlobPart[] = []
+
+      const stopPromise = new Promise<void>((resolve, reject) => {
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) chunks.push(event.data)
+        }
+        recorder.onstop = () => resolve()
+        recorder.onerror = () => reject(new Error('最終動画の録画に失敗しました。'))
+      })
+
+      recorder.start(1000)
+      await audioContext.resume()
+      videoEl.currentTime = 0
+      if (fxAudioEl) fxAudioEl.currentTime = 0
+      const playTasks: Promise<unknown>[] = [videoEl.play()]
+      if (fxAudioEl) playTasks.push(fxAudioEl.play())
+      await Promise.allSettled(playTasks)
+
+      await new Promise<void>((resolve) => {
+        const requestedDurationMs =
+          typeof targetSeconds === 'number' && Number.isFinite(targetSeconds) && targetSeconds > 0
+            ? Math.floor(targetSeconds * 1000)
+            : null
+        const naturalDurationMs = Number.isFinite(videoEl.duration) ? Math.floor(videoEl.duration * 1000) : null
+        const stopAfterMs = Math.max(1000, requestedDurationMs ?? naturalDurationMs ?? 15000)
+        const timer = window.setTimeout(resolve, stopAfterMs)
+        videoEl.onended = () => {
+          window.clearTimeout(timer)
+          resolve()
+        }
+      })
+
+      videoEl.pause()
+      if (fxAudioEl) fxAudioEl.pause()
+      if (recorder.state !== 'inactive') recorder.stop()
+      await stopPromise
+
+      sourceStream.getTracks().forEach((track: MediaStreamTrack) => track.stop())
+      mixedStream.getTracks().forEach((track: MediaStreamTrack) => track.stop())
+      await audioContext.close().catch(() => undefined)
+
+      const mixedBlob = new Blob(chunks, { type: mimeType })
+      return URL.createObjectURL(mixedBlob)
     },
     [],
   )
@@ -1084,15 +880,9 @@ export function Video() {
       let fallbackVideo: string | null = null
 
       try {
-        const trimmedSpeech = speechText.trim()
         const trimmedSfx = sfxPrompt.trim()
-        const hasSpeechInput = trimmedSpeech.length > 0
-        const shouldRunSpeech = hasSpeechInput && speechMixSupported
         const shouldRunSfx = trimmedSfx.length > 0
-        if (hasSpeechInput && !shouldRunSpeech) {
-          setStatusMessage('このブラウザでは音声合成に対応していないため、セリフをスキップして続行します。')
-        }
-        const pipelineUsageId = shouldRunSpeech || shouldRunSfx ? makePipelineUsageId() : ""
+        const pipelineUsageId = shouldRunSfx ? makePipelineUsageId() : ''
         let baseVideo: string | null = null
         const submitted = await submitVideo(imagePayload, accessToken)
         if (runIdRef.current !== runId) return
@@ -1112,7 +902,7 @@ export function Video() {
         }
         fallbackVideo = baseVideo
 
-        if (!shouldRunSpeech && !shouldRunSfx) {
+        if (!shouldRunSfx) {
           setDisplayVideo(baseVideo)
           setStatusMessage('動画生成が完了しました。')
           if (accessToken) {
@@ -1130,7 +920,7 @@ export function Video() {
           fallbackVideo = pipelineVideo
 
           // Keep the original generated visuals and only borrow the SFX audio track.
-          if (!shouldRunSpeech && speechMixSupported) {
+          if (mediaMixSupported) {
             setStatusMessage('動画と効果音を合成中です…')
             const mixedWithSfx = await mixVideoWithAudioTracks(baseVideo, runId, {
               fxAudioVideoSource: fxVideo,
@@ -1140,22 +930,6 @@ export function Video() {
             pipelineVideo = mixedWithSfx
             fallbackVideo = pipelineVideo
           }
-        }
-
-        if (shouldRunSpeech) {
-          setStatusMessage('セリフ音声を生成中です…')
-          const speechAudio = await runSpeechPipeline(trimmedSpeech, voiceDesign.trim(), runId, pipelineUsageId)
-          if (!speechAudio || runIdRef.current !== runId) return
-
-          setStatusMessage('動画と音声を合成中です…')
-          const mixedVideo = await mixVideoWithAudioTracks(baseVideo, runId, {
-            speechAudioDataUrl: speechAudio,
-            fxAudioVideoSource: shouldRunSfx ? pipelineVideo : null,
-            targetSeconds: selectedVideoLength.seconds,
-          })
-          if (!mixedVideo || runIdRef.current !== runId) return
-          pipelineVideo = mixedVideo
-          fallbackVideo = pipelineVideo
         }
 
         setDisplayVideo(pipelineVideo)
@@ -1187,13 +961,11 @@ export function Video() {
       mixVideoWithAudioTracks,
       pollJob,
       runMMAudioPipeline,
-      runSpeechPipeline,
+      mediaMixSupported,
       session,
       sfxPrompt,
-      speechMixSupported,
-      speechText,
-      voiceDesign,
       submitVideo,
+      selectedVideoLength.seconds,
     ],
   )
 
@@ -1310,7 +1082,7 @@ export function Video() {
             <span className="studio-ticket-label">必要ポイント</span>
             <strong className="studio-ticket-value">{requiredPoints}</strong>
             <span className="studio-ticket-cost">
-              {selectedVideoLength.seconds + '秒 / ' + (audioPipelineCost > 0 ? '音声パイプライン(+' + audioPipelineCost + ')' : '動画のみ')}
+              {selectedVideoLength.seconds + '秒 / ' + (audioPipelineCost > 0 ? '効果音(+' + audioPipelineCost + ')' : '動画のみ')}
             </span>
           </div>
 
@@ -1398,65 +1170,7 @@ export function Video() {
                 <div className="studio-chat-row studio-chat-row--assistant">
                   <img className="studio-chat-avatar" src={CHAT_AVATAR_ICON} alt="" aria-hidden="true" />
                   <div className="studio-chat-bubble">
-                    <strong>3. セリフとボイスデザイン</strong>
-                    <p>任意です。空欄ならセリフ生成をスキップします。</p>
-                  </div>
-                </div>
-                <div className="studio-chat-row studio-chat-row--user">
-                  <div className="studio-chat-bubble studio-chat-bubble--user">
-                    <label className="studio-field">
-                      <span>セリフ ({speechText.trim().length}/{MAX_SPEECH_TEXT_LENGTH})</span>
-                      <textarea
-                        rows={3}
-                        maxLength={MAX_SPEECH_TEXT_LENGTH}
-                        value={speechText}
-                        onChange={(e) => setSpeechText(e.target.value)}
-                        placeholder="例:はっ💋はあっ💋疲れるわね"
-                      />
-                    </label>
-                    <label className="studio-field">
-                      <span>ボイスデザイン (任意) ({voiceDesign.trim().length}/{MAX_VOICE_DESIGN_LENGTH})</span>
-                      <textarea
-                        rows={3}
-                        maxLength={MAX_VOICE_DESIGN_LENGTH}
-                        value={voiceDesign}
-                        onChange={(e) => setVoiceDesign(e.target.value)}
-                        placeholder="例:低い声の女の子。からかうようなしゃべり方。"
-                      />
-                    </label>
-
-                    <section className="studio-emoji-manual" aria-label="ボイスデザイン入力マニュアル">
-                      <h4>ボイスデザイン入力マニュアル</h4>
-                      <p>セリフ内の絵文字で感情や話し方、音の演出を調整できます。</p>
-                      <div className="studio-emoji-manual__groups">
-                        {EMOJI_MANUAL_GROUPS.map((group) => (
-                          <div key={group.title} className="studio-emoji-manual__group">
-                            <h5>{group.title}</h5>
-                            <ul>
-                              {group.items.map(([emoji, meaning]) => (
-                                <li key={`${group.title}-${emoji}`}>
-                                  <span className="studio-emoji-manual__emoji" aria-hidden="true">
-                                    {emoji}
-                                  </span>
-                                  <span>{meaning}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  </div>
-                </div>
-              </article>
-            )}
-
-            {chatStep === 4 && (
-              <article className="studio-chat-step">
-                <div className="studio-chat-row studio-chat-row--assistant">
-                  <img className="studio-chat-avatar" src={CHAT_AVATAR_ICON} alt="" aria-hidden="true" />
-                  <div className="studio-chat-bubble">
-                    <strong>4. 効果音</strong>
+                    <strong>3. 効果音</strong>
                     <p>任意です。空欄なら効果音生成をスキップします。</p>
                   </div>
                 </div>
@@ -1477,12 +1191,12 @@ export function Video() {
               </article>
             )}
 
-            {chatStep === 5 && (
+            {chatStep === 4 && (
               <article className="studio-chat-step">
                 <div className="studio-chat-row studio-chat-row--assistant">
                   <img className="studio-chat-avatar" src={CHAT_AVATAR_ICON} alt="" aria-hidden="true" />
                   <div className="studio-chat-bubble">
-                    <strong>5. 秒数選択</strong>
+                    <strong>4. 秒数選択</strong>
                     <p>5秒 / 7秒 / 10秒を選択してください。</p>
                   </div>
                 </div>
@@ -1511,12 +1225,12 @@ export function Video() {
               </article>
             )}
 
-            {chatStep === 6 && (
+            {chatStep === 5 && (
               <article className="studio-chat-step">
                 <div className="studio-chat-row studio-chat-row--assistant">
                   <img className="studio-chat-avatar" src={CHAT_AVATAR_ICON} alt="" aria-hidden="true" />
                   <div className="studio-chat-bubble">
-                    <strong>6. 設定確認</strong>
+                    <strong>5. 設定確認</strong>
                     <p>内容を確認して生成を実行してください。</p>
                   </div>
                 </div>
@@ -1525,16 +1239,13 @@ export function Video() {
                     <ul className="studio-confirm-list">
                       <li>{`素材画像: ${sourceName || '未設定'}`}</li>
                       <li>{`プロンプト: ${prompt.trim() || '未設定'}`}</li>
-                      <li>{`セリフ: ${hasSpeechText ? 'あり' : 'なし'}`}</li>
                       <li>{`効果音: ${hasSfxPrompt ? 'あり' : 'なし'}`}</li>
                       <li>{`動画秒数: ${selectedVideoLength.seconds}秒 (${selectedVideoLength.ticketCost}ポイント)`}</li>
                       <li>{`追加ポイント: ${audioPipelineCost}`}</li>
                       <li>{`合計必要ポイント: ${requiredPoints}`}</li>
                     </ul>
                     <p className="studio-field-note">
-                      {hasSpeechText || hasSfxPrompt
-                        ? 'セリフ/効果音のどちらかがあるため +1 ポイント加算されます。'
-                        : 'セリフ/効果音が空欄なので、動画生成のみ実行します。'}
+                      {hasSfxPrompt ? '効果音があるため +1 ポイント加算されます。' : '効果音が空欄なので、動画生成のみ実行します。'}
                     </p>
                     {!session && <p className="studio-field-note">生成にはGoogleログインが必要です。</p>}
                   </div>
@@ -1545,12 +1256,12 @@ export function Video() {
 
           <div className="studio-generate-dock">
             <div className="studio-chat-nav">
-              <span className="studio-chat-progress">{`${chatStep} / 6`}</span>
+              <span className="studio-chat-progress">{`${chatStep} / 5`}</span>
               <div className="studio-actions">
                 <button type="button" className="studio-btn studio-btn--ghost" onClick={goToPrevStep} disabled={chatStep === 1 || isRunning}>
                   戻る
                 </button>
-                {chatStep < 6 ? (
+                {chatStep < 5 ? (
                   <button
                     type="button"
                     className="studio-btn studio-btn--primary"
