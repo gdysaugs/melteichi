@@ -904,14 +904,19 @@ export function Video() {
     throw new Error('音声生成がタイムアウトしました。')
   }, [accessToken])
 
-  const mixVideoAndSpeech = useCallback(
+  const mixVideoWithAudioTracks = useCallback(
     async (
       videoSource: string,
-      speechAudioDataUrl: string,
       runId: number,
-      fxAudioVideoSource?: string | null,
-      targetSeconds?: number,
+      options?: {
+        speechAudioDataUrl?: string | null
+        fxAudioVideoSource?: string | null
+        targetSeconds?: number
+      },
     ) => {
+      const speechAudioDataUrl = options?.speechAudioDataUrl ?? null
+      const fxAudioVideoSource = options?.fxAudioVideoSource ?? null
+      const targetSeconds = options?.targetSeconds
       const videoDataUrl = await sourceToDataUrl(videoSource)
       const fxAudioVideoDataUrl =
         fxAudioVideoSource && fxAudioVideoSource !== videoSource ? await sourceToDataUrl(fxAudioVideoSource) : null
@@ -931,20 +936,26 @@ export function Video() {
       fxAudioEl.playsInline = true
     }
 
-    const speechEl = document.createElement('audio')
-    speechEl.src = speechAudioDataUrl
-    speechEl.preload = 'auto'
+    const speechEl = speechAudioDataUrl ? document.createElement('audio') : null
+    if (speechEl) {
+      speechEl.src = speechAudioDataUrl
+      speechEl.preload = 'auto'
+    }
 
     const metadataTasks: Promise<void>[] = [
       new Promise<void>((resolve, reject) => {
         videoEl.onloadedmetadata = () => resolve()
         videoEl.onerror = () => reject(new Error('動画メタデータの読み込みに失敗しました。'))
       }),
-      new Promise<void>((resolve, reject) => {
-        speechEl.onloadedmetadata = () => resolve()
-        speechEl.onerror = () => reject(new Error('音声メタデータの読み込みに失敗しました。'))
-      }),
     ]
+    if (speechEl) {
+      metadataTasks.push(
+        new Promise<void>((resolve, reject) => {
+          speechEl.onloadedmetadata = () => resolve()
+          speechEl.onerror = () => reject(new Error('音声メタデータの読み込みに失敗しました。'))
+        }),
+      )
+    }
     if (fxAudioEl) {
       metadataTasks.push(
         new Promise<void>((resolve, reject) => {
@@ -981,12 +992,14 @@ export function Video() {
     const audioContext = new AudioContext()
     const destination = audioContext.createMediaStreamDestination()
     const videoSourceNode = audioContext.createMediaElementSource(videoEl)
-    const speechSourceNode = audioContext.createMediaElementSource(speechEl)
     const videoGain = audioContext.createGain()
-    const speechGain = audioContext.createGain()
     videoGain.gain.value = 1
-    speechGain.gain.value = 1
-    speechSourceNode.connect(speechGain).connect(destination)
+    if (speechEl) {
+      const speechSourceNode = audioContext.createMediaElementSource(speechEl)
+      const speechGain = audioContext.createGain()
+      speechGain.gain.value = 1
+      speechSourceNode.connect(speechGain).connect(destination)
+    }
     if (fxAudioEl) {
       const fxSourceNode = audioContext.createMediaElementSource(fxAudioEl)
       const fxGain = audioContext.createGain()
@@ -1018,9 +1031,12 @@ export function Video() {
     recorder.start(1000)
     await audioContext.resume()
     videoEl.currentTime = 0
-    speechEl.currentTime = 0
+    if (speechEl) speechEl.currentTime = 0
     if (fxAudioEl) fxAudioEl.currentTime = 0
-    await Promise.allSettled([videoEl.play(), speechEl.play(), fxAudioEl?.play()])
+    const playTasks: Promise<unknown>[] = [videoEl.play()]
+    if (speechEl) playTasks.push(speechEl.play())
+    if (fxAudioEl) playTasks.push(fxAudioEl.play())
+    await Promise.allSettled(playTasks)
 
     await new Promise<void>((resolve) => {
       const requestedDurationMs =
@@ -1036,7 +1052,7 @@ export function Video() {
       }
     })
 
-    speechEl.pause()
+    if (speechEl) speechEl.pause()
     videoEl.pause()
     if (fxAudioEl) fxAudioEl.pause()
     if (recorder.state !== 'inactive') recorder.stop()
@@ -1112,6 +1128,18 @@ export function Video() {
           if (!fxVideo || runIdRef.current !== runId) return
           pipelineVideo = fxVideo
           fallbackVideo = pipelineVideo
+
+          // Keep the original generated visuals and only borrow the SFX audio track.
+          if (!shouldRunSpeech && speechMixSupported) {
+            setStatusMessage('動画と効果音を合成中です…')
+            const mixedWithSfx = await mixVideoWithAudioTracks(baseVideo, runId, {
+              fxAudioVideoSource: fxVideo,
+              targetSeconds: selectedVideoLength.seconds,
+            })
+            if (!mixedWithSfx || runIdRef.current !== runId) return
+            pipelineVideo = mixedWithSfx
+            fallbackVideo = pipelineVideo
+          }
         }
 
         if (shouldRunSpeech) {
@@ -1120,13 +1148,11 @@ export function Video() {
           if (!speechAudio || runIdRef.current !== runId) return
 
           setStatusMessage('動画と音声を合成中です…')
-          const mixedVideo = await mixVideoAndSpeech(
-            baseVideo,
-            speechAudio,
-            runId,
-            shouldRunSfx ? pipelineVideo : null,
-            selectedVideoLength.seconds,
-          )
+          const mixedVideo = await mixVideoWithAudioTracks(baseVideo, runId, {
+            speechAudioDataUrl: speechAudio,
+            fxAudioVideoSource: shouldRunSfx ? pipelineVideo : null,
+            targetSeconds: selectedVideoLength.seconds,
+          })
           if (!mixedVideo || runIdRef.current !== runId) return
           pipelineVideo = mixedVideo
           fallbackVideo = pipelineVideo
@@ -1158,7 +1184,7 @@ export function Video() {
     [
       accessToken,
       fetchTickets,
-      mixVideoAndSpeech,
+      mixVideoWithAudioTracks,
       pollJob,
       runMMAudioPipeline,
       runSpeechPipeline,
