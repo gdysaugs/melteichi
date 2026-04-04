@@ -1,0 +1,63 @@
+ARG BASE_IMAGE=suarez123/wan22-i2v:dasiwa-i2v-v9-20260328
+FROM ${BASE_IMAGE}
+
+RUN if [ -f /comfyui/requirements.txt ]; then \
+      uv pip install -r /comfyui/requirements.txt; \
+    fi \
+    && uv pip install alembic
+
+# Pin PyTorch to CUDA 12.4 wheels to avoid newer-driver requirement on RunPod hosts.
+RUN uv pip uninstall -y torch torchvision torchaudio xformers || true
+RUN uv pip install --index-url https://download.pytorch.org/whl/cu124 \
+      torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0
+RUN uv pip install \
+      opencv-python-headless \
+      imageio-ffmpeg \
+      accelerate \
+      gguf \
+      ftfy \
+      transformers \
+      diffusers \
+      onnxruntime \
+      matplotlib \
+      hydra-core \
+      segment-anything
+
+# Keep only nodes required by current WAN workflow to reduce startup/import overhead.
+RUN rm -rf \
+      /comfyui/custom_nodes/ComfyUI-Impact-Pack \
+      /comfyui/custom_nodes/ComfyUI-Impact-Subpack \
+      /comfyui/custom_nodes/ComfyUI-RMBG \
+      /comfyui/custom_nodes/comfyui_controlnet_aux
+
+# Hard-fix stale comfy_aimdo patch at build time, then validate syntax.
+RUN python - <<'PY'
+from pathlib import Path
+import re
+
+p = Path("/comfyui/main.py")
+if p.exists():
+    s = p.read_text(encoding="utf-8", errors="ignore")
+    s = s.replace("\r\n", "\n").replace("\r", "\n").lstrip("\ufeff")
+    s = re.sub(r'(?m)^\s*import\s+comfy_aimdo\.control\s*$\n?', '', s)
+    s = re.sub(r'(?m)^\s*comfy_aimdo\.control\.init\(\)\s*$\n?', '', s)
+    s = re.sub(r'(?m)^\s*if enables_dynamic_vram\(\):\s*$\n?', '', s)
+
+    lines = s.splitlines()
+    for i, line in enumerate(lines):
+        if re.match(r'^\s*if __name__ == [\'"]__main__[\'"]:\s*$', line):
+            j = i + 1
+            while j < len(lines) and lines[j].strip() == "":
+                j += 1
+            if j >= len(lines) or not lines[j].startswith((" ", "\t")):
+                lines.insert(i + 1, "    pass")
+            break
+
+    p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+PY
+RUN python -m py_compile /comfyui/main.py
+
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

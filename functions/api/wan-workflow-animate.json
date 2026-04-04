@@ -1,0 +1,970 @@
+{
+    "1":  {
+              "class_type":  "CLIPTextEncode",
+              "inputs":  {
+                             "text":  "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走",
+                             "clip":  [
+                                          "490:2",
+                                          0
+                                      ]
+                         },
+              "_meta":  {
+                            "title":  "CLIP Text Encode (Negative Prompt)"
+                        }
+          },
+    "522":  {
+                "class_type":  "easy seed",
+                "inputs":  {
+                               "seed":  208077700499050
+                           },
+                "_meta":  {
+                              "title":  "easy seed"
+                          }
+            },
+    "9":  {
+              "class_type":  "CLIPVisionEncode",
+              "inputs":  {
+                             "crop":  "none",
+                             "clip_vision":  [
+                                                 "490:4",
+                                                 0
+                                             ],
+                             "image":  [
+                                           "10",
+                                           0
+                                       ]
+                         },
+              "_meta":  {
+                            "title":  "CLIPVisionEncode"
+                        }
+          },
+    "432":  {
+                "class_type":  "VHS_VideoCombine",
+                "inputs":  {
+                               "frame_rate":  [
+                                                  "496:503",
+                                                  0
+                                              ],
+                               "loop_count":  0,
+                               "filename_prefix":  "wan2/anime-seg",
+                               "format":  "video/nvenc_h264-mp4",
+                               "pix_fmt":  "yuv420p",
+                               "bitrate":  10,
+                               "megabit":  true,
+                               "save_metadata":  true,
+                               "pingpong":  false,
+                               "save_output":  false,
+                               "images":  [
+                                              "232:230",
+                                              0
+                                          ],
+                               "audio":  [
+                                             "507",
+                                             2
+                                         ]
+                           },
+                "_meta":  {
+                              "title":  "VHS_VideoCombine"
+                          }
+            },
+    "433":  {
+                "class_type":  "VHS_VideoCombine",
+                "inputs":  {
+                               "frame_rate":  [
+                                                  "496:503",
+                                                  0
+                                              ],
+                               "loop_count":  0,
+                               "filename_prefix":  "wan2/anime-seg",
+                               "format":  "video/nvenc_h264-mp4",
+                               "pix_fmt":  "yuv420p",
+                               "bitrate":  10,
+                               "megabit":  true,
+                               "save_metadata":  true,
+                               "pingpong":  false,
+                               "save_output":  false,
+                               "images":  [
+                                              "242:87",
+                                              0
+                                          ],
+                               "audio":  [
+                                             "507",
+                                             2
+                                         ]
+                           },
+                "_meta":  {
+                              "title":  "VHS_VideoCombine"
+                          }
+            },
+    "488":  {
+                "class_type":  "easy forLoopEnd",
+                "inputs":  {
+                               "flow":  [
+                                            "487",
+                                            0
+                                        ],
+                               "initial_value1":  [
+                                                      "242:86",
+                                                      0
+                                                  ],
+                               "initial_value2":  [
+                                                      "242:244",
+                                                      5
+                                                  ]
+                           },
+                "_meta":  {
+                              "title":  "easy forLoopEnd"
+                          }
+            },
+    "528":  {
+                "class_type":  "PlaySound|pysssss",
+                "inputs":  {
+                               "mode":  "always",
+                               "volume":  1,
+                               "file":  "notify.mp3",
+                               "any":  [
+                                           "568",
+                                           0
+                                       ]
+                           },
+                "_meta":  {
+                              "title":  "PlaySound|pysssss"
+                          }
+            },
+    "568":  {
+                "class_type":  "VHS_SplitImages",
+                "inputs":  {
+                               "split_index":  [
+                                                   "507",
+                                                   1
+                                               ],
+                               "images":  [
+                                              "488",
+                                              0
+                                          ]
+                           },
+                "_meta":  {
+                              "title":  "VHS_SplitImages"
+                          }
+            },
+    "489":  {
+                "class_type":  "VHS_VideoCombine",
+                "inputs":  {
+                               "frame_rate":  [
+                                                  "496:503",
+                                                  0
+                                              ],
+                               "loop_count":  0,
+                               "filename_prefix":  "wan2/anime",
+                               "format":  "video/nvenc_h264-mp4",
+                               "pix_fmt":  "yuv420p",
+                               "bitrate":  30,
+                               "megabit":  true,
+                               "save_metadata":  true,
+                               "pingpong":  false,
+                               "save_output":  true,
+                               "images":  [
+                                              "568",
+                                              0
+                                          ],
+                               "audio":  [
+                                             "507",
+                                             2
+                                         ]
+                           },
+                "_meta":  {
+                              "title":  "VHS_VideoCombine"
+                          }
+            },
+    "487":  {
+                "class_type":  "easy forLoopStart",
+                "inputs":  {
+                               "total":  [
+                                             "526",
+                                             0
+                                         ],
+                               "initial_value1":  [
+                                                      "232:230",
+                                                      0
+                                                  ],
+                               "initial_value2":  [
+                                                      "232:235",
+                                                      5
+                                                  ]
+                           },
+                "_meta":  {
+                              "title":  "easy forLoopStart"
+                          }
+            },
+    "507":  {
+                "class_type":  "VHS_LoadVideo",
+                "inputs":  {
+                               "video":  "LTX2_00008.mp4",
+                               "force_rate":  0,
+                               "custom_width":  0,
+                               "custom_height":  0,
+                               "frame_load_cap":  0,
+                               "skip_first_frames":  0,
+                               "select_every_nth":  1,
+                               "format":  "None"
+                           },
+                "_meta":  {
+                              "title":  "VHS_LoadVideo"
+                          }
+            },
+    "557":  {
+                "class_type":  "SAM3Segment",
+                "inputs":  {
+                               "image":  [
+                                             "507",
+                                             0
+                                         ]
+                           },
+                "_meta":  {
+                              "title":  "SAM3Segment"
+                          }
+            },
+    "556":  {
+                "class_type":  "VHS_VideoCombine",
+                "inputs":  {
+                               "frame_rate":  [
+                                                  "496:503",
+                                                  0
+                                              ],
+                               "loop_count":  0,
+                               "filename_prefix":  "wan2/anime-mask",
+                               "format":  "video/nvenc_h264-mp4",
+                               "pix_fmt":  "yuv420p",
+                               "bitrate":  10,
+                               "megabit":  true,
+                               "save_metadata":  true,
+                               "pingpong":  false,
+                               "save_output":  false,
+                               "images":  [
+                                              "565:562",
+                                              0
+                                          ]
+                           },
+                "_meta":  {
+                              "title":  "VHS_VideoCombine"
+                          }
+            },
+    "21":  {
+               "class_type":  "CLIPTextEncode",
+               "inputs":  {
+                              "text":  "girl is dancing",
+                              "clip":  [
+                                           "490:2",
+                                           0
+                                       ]
+                          },
+               "_meta":  {
+                             "title":  "CLIP Text Encode (Positive Prompt)"
+                         }
+           },
+    "10":  {
+               "class_type":  "LoadImage",
+               "inputs":  {
+                              "image":  "example.png",
+                              "upload":  "image"
+                          },
+               "_meta":  {
+                             "title":  "LoadImage"
+                         }
+           },
+    "526":  {
+                "class_type":  "easy simpleMath",
+                "inputs":  {
+                               "value":  "ceil( ( a * b ) / c) - 1",
+                               "a":  [
+                                         "496:503",
+                                         2
+                                     ],
+                               "b":  [
+                                         "496:503",
+                                         0
+                                     ],
+                               "c":  [
+                                         "516:514",
+                                         0
+                                     ]
+                           },
+                "_meta":  {
+                              "title":  "easy simpleMath"
+                          }
+            },
+    "242:92":  {
+                   "class_type":  "TrimVideoLatent",
+                   "inputs":  {
+                                  "trim_amount":  [
+                                                      "242:244",
+                                                      3
+                                                  ],
+                                  "samples":  [
+                                                  "242:91",
+                                                  0
+                                              ]
+                              },
+                   "_meta":  {
+                                 "title":  "TrimVideoLatent"
+                             }
+               },
+    "242:85":  {
+                   "class_type":  "ImageFromBatch",
+                   "inputs":  {
+                                  "batch_index":  [
+                                                      "242:244",
+                                                      4
+                                                  ],
+                                  "image":  [
+                                                "242:87",
+                                                0
+                                            ]
+                              },
+                   "_meta":  {
+                                 "title":  "ImageFromBatch"
+                             }
+               },
+    "242:86":  {
+                   "class_type":  "ImageBatch",
+                   "inputs":  {
+                                  "image1":  [
+                                                 "487",
+                                                 2
+                                             ],
+                                  "image2":  [
+                                                 "242:85",
+                                                 0
+                                             ]
+                              },
+                   "_meta":  {
+                                 "title":  "ImageBatch"
+                             }
+               },
+    "242:551":  {
+                    "class_type":  "ImpactIfNone",
+                    "inputs":  {
+                                   "signal":  [
+                                                  "565:561",
+                                                  0
+                                              ],
+                                   "any_input":  [
+                                                     "565:561",
+                                                     0
+                                                 ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactIfNone"
+                              }
+                },
+    "242:552":  {
+                    "class_type":  "ImpactConditionalBranchSelMode",
+                    "inputs":  {
+                                   "cond":  [
+                                                "242:551",
+                                                1
+                                            ],
+                                   "tt_value":  [
+                                                    "565:562",
+                                                    0
+                                                ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactConditionalBranchSelMode"
+                              }
+                },
+    "242:553":  {
+                    "class_type":  "ImpactConditionalBranchSelMode",
+                    "inputs":  {
+                                   "cond":  [
+                                                "242:551",
+                                                1
+                                            ],
+                                   "tt_value":  [
+                                                    "242:551",
+                                                    0
+                                                ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactConditionalBranchSelMode"
+                              }
+                },
+    "242:244":  {
+                    "class_type":  "WanAnimateToVideo",
+                    "inputs":  {
+                                   "width":  [
+                                                 "516:512",
+                                                 0
+                                             ],
+                                   "height":  [
+                                                  "516:511",
+                                                  0
+                                              ],
+                                   "length":  [
+                                                  "516:514",
+                                                  0
+                                              ],
+                                   "batch_size":  1,
+                                   "strength":  5,
+                                   "video_frame_offset":  [
+                                                              "487",
+                                                              3
+                                                          ],
+                                   "positive":  [
+                                                    "21",
+                                                    0
+                                                ],
+                                   "negative":  [
+                                                    "1",
+                                                    0
+                                                ],
+                                   "vae":  [
+                                               "490:3",
+                                               0
+                                           ],
+                                   "clip_vision_output":  [
+                                                              "9",
+                                                              0
+                                                          ],
+                                   "reference_image":  [
+                                                           "10",
+                                                           0
+                                                       ],
+                                   "face_video":  [
+                                                      "496:100",
+                                                      0
+                                                  ],
+                                   "pose_video":  [
+                                                      "496:101",
+                                                      0
+                                                  ],
+                                   "background_video":  [
+                                                            "242:552",
+                                                            0
+                                                        ],
+                                   "character_mask":  [
+                                                          "242:553",
+                                                          0
+                                                      ],
+                                   "continue_motion":  [
+                                                           "487",
+                                                           2
+                                                       ]
+                               },
+                    "_meta":  {
+                                  "title":  "WanAnimateToVideo"
+                              }
+                },
+    "242:87":  {
+                   "class_type":  "VAEDecode",
+                   "inputs":  {
+                                  "samples":  [
+                                                  "242:92",
+                                                  0
+                                              ],
+                                  "vae":  [
+                                              "490:3",
+                                              0
+                                          ]
+                              },
+                   "_meta":  {
+                                 "title":  "VAEDecode"
+                             }
+               },
+    "242:91":  {
+                   "class_type":  "KSampler",
+                   "inputs":  {
+                                  "seed":  [
+                                               "522",
+                                               0
+                                           ],
+                                  "control_after_generate":  "fixed",
+                                  "steps":  6,
+                                  "cfg":  1,
+                                  "sampler_name":  "euler",
+                                  "scheduler":  "simple",
+                                  "denoise":  1,
+                                  "model":  [
+                                                "490:60",
+                                                0
+                                            ],
+                                  "positive":  [
+                                                   "242:244",
+                                                   0
+                                               ],
+                                  "negative":  [
+                                                   "242:244",
+                                                   1
+                                               ],
+                                  "latent_image":  [
+                                                       "242:244",
+                                                       2
+                                                   ]
+                              },
+                   "_meta":  {
+                                 "title":  "KSampler"
+                             }
+               },
+    "516:513":  {
+                    "class_type":  "GetLatentSizeAndCount",
+                    "inputs":  {
+                                   "latent":  [
+                                                  "516:515",
+                                                  0
+                                              ]
+                               },
+                    "_meta":  {
+                                  "title":  "GetLatentSizeAndCount"
+                              }
+                },
+    "516:515":  {
+                    "class_type":  "EmptyHunyuanLatentVideo",
+                    "inputs":  {
+                                   "width":  544,
+                                   "height":  960,
+                                   "length":  77
+                               },
+                    "_meta":  {
+                                  "title":  "EmptyHunyuanLatentVideo"
+                              }
+                },
+    "516:512":  {
+                    "class_type":  "SimpleMath+",
+                    "inputs":  {
+                                   "a":  [
+                                             "516:513",
+                                             5
+                                         ]
+                               },
+                    "_meta":  {
+                                  "title":  "SimpleMath+"
+                              }
+                },
+    "516:511":  {
+                    "class_type":  "SimpleMath+",
+                    "inputs":  {
+                                   "a":  [
+                                             "516:513",
+                                             4
+                                         ]
+                               },
+                    "_meta":  {
+                                  "title":  "SimpleMath+"
+                              }
+                },
+    "516:514":  {
+                    "class_type":  "SimpleMath+",
+                    "inputs":  {
+                                   "a":  [
+                                             "516:513",
+                                             3
+                                         ]
+                               },
+                    "_meta":  {
+                                  "title":  "SimpleMath+"
+                              }
+                },
+    "232:57":  {
+                   "class_type":  "TrimVideoLatent",
+                   "inputs":  {
+                                  "trim_amount":  [
+                                                      "232:235",
+                                                      3
+                                                  ],
+                                  "samples":  [
+                                                  "232:63",
+                                                  0
+                                              ]
+                              },
+                   "_meta":  {
+                                 "title":  "TrimVideoLatent"
+                             }
+               },
+    "232:531":  {
+                    "class_type":  "ImpactIfNone",
+                    "inputs":  {
+                                   "signal":  [
+                                                  "565:561",
+                                                  0
+                                              ],
+                                   "any_input":  [
+                                                     "565:561",
+                                                     0
+                                                 ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactIfNone"
+                              }
+                },
+    "232:532":  {
+                    "class_type":  "ImpactConditionalBranchSelMode",
+                    "inputs":  {
+                                   "cond":  [
+                                                "232:531",
+                                                1
+                                            ],
+                                   "tt_value":  [
+                                                    "232:531",
+                                                    0
+                                                ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactConditionalBranchSelMode"
+                              }
+                },
+    "232:230":  {
+                    "class_type":  "ImageFromBatch",
+                    "inputs":  {
+                                   "batch_index":  [
+                                                       "232:235",
+                                                       4
+                                                   ],
+                                   "image":  [
+                                                 "232:58",
+                                                 0
+                                             ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImageFromBatch"
+                              }
+                },
+    "232:58":  {
+                   "class_type":  "VAEDecode",
+                   "inputs":  {
+                                  "samples":  [
+                                                  "232:57",
+                                                  0
+                                              ],
+                                  "vae":  [
+                                              "490:3",
+                                              0
+                                          ]
+                              },
+                   "_meta":  {
+                                 "title":  "VAEDecode"
+                             }
+               },
+    "232:63":  {
+                   "class_type":  "KSampler",
+                   "inputs":  {
+                                  "seed":  [
+                                               "522",
+                                               0
+                                           ],
+                                  "control_after_generate":  "randomize",
+                                  "steps":  6,
+                                  "cfg":  1,
+                                  "sampler_name":  "euler",
+                                  "scheduler":  "simple",
+                                  "denoise":  1,
+                                  "model":  [
+                                                "490:60",
+                                                0
+                                            ],
+                                  "positive":  [
+                                                   "232:235",
+                                                   0
+                                               ],
+                                  "negative":  [
+                                                   "232:235",
+                                                   1
+                                               ],
+                                  "latent_image":  [
+                                                       "232:235",
+                                                       2
+                                                   ]
+                              },
+                   "_meta":  {
+                                 "title":  "KSampler"
+                             }
+               },
+    "232:235":  {
+                    "class_type":  "WanAnimateToVideo",
+                    "inputs":  {
+                                   "width":  [
+                                                 "516:512",
+                                                 0
+                                             ],
+                                   "height":  [
+                                                  "516:511",
+                                                  0
+                                              ],
+                                   "length":  [
+                                                  "516:514",
+                                                  0
+                                              ],
+                                   "batch_size":  1,
+                                   "strength":  5,
+                                   "video_frame_offset":  0,
+                                   "positive":  [
+                                                    "21",
+                                                    0
+                                                ],
+                                   "negative":  [
+                                                    "1",
+                                                    0
+                                                ],
+                                   "vae":  [
+                                               "490:3",
+                                               0
+                                           ],
+                                   "clip_vision_output":  [
+                                                              "9",
+                                                              0
+                                                          ],
+                                   "reference_image":  [
+                                                           "10",
+                                                           0
+                                                       ],
+                                   "face_video":  [
+                                                      "496:100",
+                                                      0
+                                                  ],
+                                   "pose_video":  [
+                                                      "496:101",
+                                                      0
+                                                  ],
+                                   "background_video":  [
+                                                            "232:530",
+                                                            0
+                                                        ],
+                                   "character_mask":  [
+                                                          "232:532",
+                                                          0
+                                                      ]
+                               },
+                    "_meta":  {
+                                  "title":  "WanAnimateToVideo"
+                              }
+                },
+    "232:530":  {
+                    "class_type":  "ImpactConditionalBranchSelMode",
+                    "inputs":  {
+                                   "cond":  [
+                                                "232:531",
+                                                1
+                                            ],
+                                   "tt_value":  [
+                                                    "565:562",
+                                                    0
+                                                ]
+                               },
+                    "_meta":  {
+                                  "title":  "ImpactConditionalBranchSelMode"
+                              }
+                },
+    "565:562":  {
+                    "class_type":  "DrawMaskOnImage",
+                    "inputs":  {
+                                   "image":  [
+                                                 "507",
+                                                 0
+                                             ],
+                                   "mask":  [
+                                                "565:561",
+                                                0
+                                            ]
+                               },
+                    "_meta":  {
+                                  "title":  "DrawMaskOnImage"
+                              }
+                },
+    "565:561":  {
+                    "class_type":  "BlockifyMask",
+                    "inputs":  {
+                                   "masks":  [
+                                                 "565:564",
+                                                 0
+                                             ]
+                               },
+                    "_meta":  {
+                                  "title":  "BlockifyMask"
+                              }
+                },
+    "565:564":  {
+                    "class_type":  "GrowMask",
+                    "inputs":  {
+                                   "mask":  [
+                                                "557",
+                                                1
+                                            ]
+                               },
+                    "_meta":  {
+                                  "title":  "GrowMask"
+                              }
+                },
+    "496:158":  {
+                    "class_type":  "PixelPerfectResolution",
+                    "inputs":  {
+                                   "image_gen_width":  [
+                                                           "516:512",
+                                                           0
+                                                       ],
+                                   "image_gen_height":  [
+                                                            "516:511",
+                                                            0
+                                                        ],
+                                   "original_image":  [
+                                                          "507",
+                                                          0
+                                                      ]
+                               },
+                    "_meta":  {
+                                  "title":  "PixelPerfectResolution"
+                              }
+                },
+    "496:503":  {
+                    "class_type":  "VHS_VideoInfoLoaded",
+                    "inputs":  {
+                                   "video_info":  [
+                                                      "507",
+                                                      3
+                                                  ]
+                               },
+                    "_meta":  {
+                                  "title":  "VHS_VideoInfoLoaded"
+                              }
+                },
+    "496:100":  {
+                    "class_type":  "DWPreprocessor",
+                    "inputs":  {
+                                   "detect_face":  512,
+                                   "resolution":  [
+                                                      "496:158",
+                                                      0
+                                                  ],
+                                   "image":  [
+                                                 "496:579",
+                                                 0
+                                             ]
+                               },
+                    "_meta":  {
+                                  "title":  "DWPreprocessor"
+                              }
+                },
+    "496:101":  {
+                    "class_type":  "DWPreprocessor",
+                    "inputs":  {
+                                   "resolution":  [
+                                                      "496:158",
+                                                      0
+                                                  ],
+                                   "image":  [
+                                                 "496:579",
+                                                 0
+                                             ]
+                               },
+                    "_meta":  {
+                                  "title":  "DWPreprocessor"
+                              }
+                },
+    "496:577":  {
+                    "class_type":  "RMBG",
+                    "inputs":  {
+                                   "image":  [
+                                                 "507",
+                                                 0
+                                             ]
+                               },
+                    "_meta":  {
+                                  "title":  "RMBG"
+                              }
+                },
+    "496:579":  {
+                    "class_type":  "easy ifElse",
+                    "inputs":  {
+                                   "boolean":  512,
+                                   "on_true":  [
+                                                   "496:577",
+                                                   0
+                                               ],
+                                   "on_false":  [
+                                                    "507",
+                                                    0
+                                                ]
+                               },
+                    "_meta":  {
+                                  "title":  "easy ifElse"
+                              }
+                },
+    "490:60":  {
+                   "class_type":  "ModelSamplingSD3",
+                   "inputs":  {
+                                  "shift":  8,
+                                  "model":  [
+                                                "490:99",
+                                                0
+                                            ]
+                              },
+                   "_meta":  {
+                                 "title":  "ModelSamplingSD3"
+                             }
+               },
+    "490:486":  {
+                    "class_type":  "GGUFLoaderKJ",
+                    "inputs":  {
+                                   "model_name":  "Wan2.2-Animate-14B-Q4_K_M.gguf",
+                                   "attention_override":  "sageattn"
+                               },
+                    "_meta":  {
+                                  "title":  "GGUFLoaderKJ"
+                              }
+                },
+    "490:18":  {
+                   "class_type":  "LoraLoaderModelOnly",
+                   "inputs":  {
+                                  "lora_name":  "wan21-lightx2v-i2v-14b-480p-cfg-step-distill-rank64-bf16.safetensors",
+                                  "strength_model":  1,
+                                  "model":  [
+                                                "490:486",
+                                                0
+                                            ]
+                              },
+                   "_meta":  {
+                                 "title":  "LoraLoaderModelOnly"
+                             }
+               },
+    "490:99":  {
+                   "class_type":  "LoraLoaderModelOnly",
+                   "inputs":  {
+                                  "lora_name":  "wan2.2_animate_14B_relight_lora_bf16.safetensors",
+                                  "strength_model":  1,
+                                  "model":  [
+                                                "490:18",
+                                                0
+                                            ]
+                              },
+                   "_meta":  {
+                                 "title":  "LoraLoaderModelOnly"
+                             }
+               },
+    "490:2":  {
+                  "class_type":  "CLIPLoader",
+                  "inputs":  {
+                                 "clip_name":  "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+                                 "type":  "wan",
+                                 "device":  "default"
+                             },
+                  "_meta":  {
+                                "title":  "CLIPLoader"
+                            }
+              },
+    "490:3":  {
+                  "class_type":  "VAELoader",
+                  "inputs":  {
+                                 "vae_name":  "wan_2.1_vae.safetensors"
+                             },
+                  "_meta":  {
+                                "title":  "VAELoader"
+                            }
+              },
+    "490:4":  {
+                  "class_type":  "CLIPVisionLoader",
+                  "inputs":  {
+                                 "clip_name":  "clip_vision_h.safetensors"
+                             },
+                  "_meta":  {
+                                "title":  "CLIPVisionLoader"
+                            }
+              }
+}

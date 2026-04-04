@@ -1,0 +1,23 @@
+{
+  "image": { "id": "106", "input": "image" },
+  "prompt": { "id": "6", "input": "text" },
+  "negative_prompt": { "id": "7", "input": "text" },
+  "seed": [
+    { "id": "57", "input": "noise_seed" },
+    { "id": "58", "input": "noise_seed" }
+  ],
+  "steps": [
+    { "id": "57", "input": "steps" },
+    { "id": "58", "input": "steps" }
+  ],
+  "cfg": [
+    { "id": "57", "input": "cfg" },
+    { "id": "58", "input": "cfg" }
+  ],
+  "width": { "id": "107", "input": "width" },
+  "height": { "id": "107", "input": "height" },
+  "num_frames": { "id": "107", "input": "length" },
+  "fps": { "id": "99", "input": "frame_rate" },
+  "start_step": { "id": "58", "input": "start_at_step" },
+  "end_step": { "id": "57", "input": "end_at_step" }
+}

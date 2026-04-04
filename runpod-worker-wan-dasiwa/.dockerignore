@@ -1,0 +1,12 @@
+.git
+__pycache__/
+*.pyc
+.DS_Store
+models/loras/**
+models/unet/*
+!models/unet/DasiwaWAN22I2V14BLightspeed_synthseductionHighV9.safetensors
+!models/unet/DasiwaWAN22I2V14BLightspeed_synthseductionLowV9.safetensors
+models/text_encoders/*
+!models/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors
+models/vae/*
+!models/vae/wan_2.1_vae.safetensors

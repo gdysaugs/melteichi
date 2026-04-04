@@ -1,0 +1,196 @@
+{
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "97",
+        0
+      ],
+      "text": "best quality, detailed"
+    }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "97",
+        0
+      ],
+      "text": ""
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "58",
+        0
+      ],
+      "vae": [
+        "39",
+        0
+      ]
+    }
+  },
+  "39": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "54": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "77",
+        0
+      ],
+      "shift": 5
+    }
+  },
+  "55": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "103",
+        0
+      ],
+      "shift": 5
+    }
+  },
+  "57": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "54",
+        0
+      ],
+      "positive": [
+        "107",
+        0
+      ],
+      "negative": [
+        "107",
+        1
+      ],
+      "latent_image": [
+        "107",
+        2
+      ],
+      "noise_seed": 0,
+      "steps": 4,
+      "end_at_step": 2,
+      "add_noise": "enable",
+      "control_after_generate": "fixed",
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "start_at_step": 0,
+      "return_with_leftover_noise": "enable"
+    }
+  },
+  "58": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "55",
+        0
+      ],
+      "positive": [
+        "107",
+        0
+      ],
+      "negative": [
+        "107",
+        1
+      ],
+      "latent_image": [
+        "57",
+        0
+      ],
+      "noise_seed": 0,
+      "steps": 4,
+      "start_at_step": 2,
+      "add_noise": "disable",
+      "control_after_generate": "fixed",
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable"
+    }
+  },
+  "77": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2FP8H.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "97": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    }
+  },
+  "99": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "8",
+        0
+      ],
+      "frame_rate": 10,
+      "loop_count": 0,
+      "filename_prefix": "video/akumaai_i2v",
+      "format": "video/nvenc_h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 14,
+      "save_metadata": true,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true
+    }
+  },
+  "103": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2FP8L.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "106": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "first_frame.png",
+      "upload": "image"
+    }
+  },
+  "107": {
+    "class_type": "WanImageToVideo",
+    "inputs": {
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "vae": [
+        "39",
+        0
+      ],
+      "start_image": [
+        "106",
+        0
+      ],
+      "width": 832,
+      "height": 480,
+      "length": 81,
+      "batch_size": 1
+    }
+  }
+}

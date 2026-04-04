@@ -1,0 +1,19 @@
+{
+  "image": { "id": "10", "input": "image" },
+  "video": { "id": "507", "input": "video" },
+  "prompt": { "id": "21", "input": "text" },
+  "negative_prompt": { "id": "1", "input": "text" },
+  "seed": { "id": "522", "input": "seed" },
+  "steps": [
+    { "id": "232:63", "input": "steps" },
+    { "id": "242:91", "input": "steps" }
+  ],
+  "cfg": [
+    { "id": "232:63", "input": "cfg" },
+    { "id": "242:91", "input": "cfg" }
+  ],
+  "width": { "id": "516:515", "input": "width" },
+  "height": { "id": "516:515", "input": "height" },
+  "num_frames": { "id": "516:515", "input": "length" },
+  "fps": { "id": "507", "input": "force_rate" }
+}
