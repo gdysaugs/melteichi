@@ -1,8 +1,8 @@
-# akumaai
+# melteichi
 
 AI video app (I2V / Animate) running on **Cloudflare Pages + Pages Functions**.
 
-Official URL: https://akumaai.cc
+Official URL: https://melteichi.uk
 
 ## Architecture
 
@@ -15,6 +15,7 @@ Official URL: https://akumaai.cc
 
 1. Install dependencies
 ```bash
+nvm use
 npm install
 ```
 
@@ -31,6 +32,8 @@ SUPABASE_SERVICE_ROLE_KEY=...
 npm run dev
 ```
 
+Build requires Node 24.x. The repository version is pinned in `.nvmrc`.
+
 ## Cloudflare Pages
 
 Build command:
@@ -45,7 +48,7 @@ dist
 
 Deploy example:
 ```bash
-npx wrangler pages deploy dist --project-name akumaai --branch main
+npx wrangler pages deploy dist --project-name melteichi --branch main
 ```
 
 ## Required Pages Environment Variables

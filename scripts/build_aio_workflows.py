@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-src = Path('/home/adama/akumaai/functions/api/wan-workflow.json')
+src = Path('/home/adama/melteichi/functions/api/wan-workflow.json')
 with src.open('r', encoding='utf-8') as f:
     prompt = json.load(f)
 
@@ -25,6 +25,6 @@ def build(subset, out_path):
         json.dump(out, f, ensure_ascii=False, indent=2)
     print('Wrote', out_path)
 
-build(i2v_ids, Path('/home/adama/akumaai/functions/api/wan-workflow-i2v.json'))
-build(t2v_ids, Path('/home/adama/akumaai/functions/api/wan-workflow-t2v.json'))
+build(i2v_ids, Path('/home/adama/melteichi/functions/api/wan-workflow-i2v.json'))
+build(t2v_ids, Path('/home/adama/melteichi/functions/api/wan-workflow-t2v.json'))
 

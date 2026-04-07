@@ -109,7 +109,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const appTag = String(session.metadata?.app ?? '')
-  if (appTag !== 'akumaai') {
+  if (appTag !== 'melteichi') {
     return jsonResponse({ received: true })
   }
 

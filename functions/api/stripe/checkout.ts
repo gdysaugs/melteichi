@@ -147,8 +147,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   params.set('metadata[tickets]', String(plan.tickets))
   params.set('metadata[price_id]', priceId)
   params.set('metadata[plan_label]', plan.label)
-  params.set('metadata[app]', 'akumaai')
-  params.set('payment_intent_data[statement_descriptor]', 'AKUMAAI')
+  params.set('metadata[app]', 'melteichi')
+  params.set('payment_intent_data[statement_descriptor]', 'MELTEICHI')
 
   let stripeRes: Response
   try {

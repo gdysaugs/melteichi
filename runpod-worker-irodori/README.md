@@ -9,7 +9,7 @@ RunPod Serverless worker for Irodori-TTS VoiceDesign v2 only.
 ## Build
 
 ```bash
-cd /home/adama/akumaai
+cd /home/adama/melteichi
 docker build -t suarez123/wan22-i2v:irodori-tts-voicedesign-v2-20260401 ./runpod-worker-irodori
 docker push suarez123/wan22-i2v:irodori-tts-voicedesign-v2-20260401
 ```
