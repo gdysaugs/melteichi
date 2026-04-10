@@ -31,8 +31,15 @@ const jsonResponse = (body: unknown, status = 200, headers: HeadersInit = {}) =>
   })
 
 const DEFAULT_LORA_PACK_ENDPOINT = 'https://api.runpod.ai/v2/rywgsws0odibjj'
-const LORA_PACK_STRENGTH_HIGH = 0.1
-const LORA_PACK_STRENGTH_LOW = 0.1
+type LoraPackStrengthMode = 'low' | 'high'
+const LORA_PACK_STRENGTHS_LOW = { high: 0.1, low: 0.1 } as const
+const LORA_PACK_STRENGTHS_HIGH = { high: 0.2, low: 0.2 } as const
+
+const parseLoraPackStrengthMode = (value: unknown): LoraPackStrengthMode =>
+  String(value ?? '').trim().toLowerCase() === 'high' ? 'high' : 'low'
+
+const resolveLoraPackStrengths = (mode: LoraPackStrengthMode) =>
+  mode === 'high' ? LORA_PACK_STRENGTHS_HIGH : LORA_PACK_STRENGTHS_LOW
 
 const LORA_PACK_HIGH_LORAS = [
   'iGoon - Blink_Back_Doggystyle_HIGH.safetensors',
@@ -756,7 +763,10 @@ const applyNodeMap = (
   }
 }
 
-const applyLoraPackStack = (workflow: Record<string, any>) => {
+const applyLoraPackStack = (
+  workflow: Record<string, any>,
+  strengths: { high: number; low: number },
+) => {
   const highUnetNodeIds: string[] = []
   const lowUnetNodeIds: string[] = []
 
@@ -810,8 +820,8 @@ const applyLoraPackStack = (workflow: Record<string, any>) => {
     return currentNodeId
   }
 
-  const highFinalNodeId = createChain(highBaseNodeId, LORA_PACK_HIGH_LORAS, LORA_PACK_STRENGTH_HIGH)
-  const lowFinalNodeId = createChain(lowBaseNodeId, LORA_PACK_LOW_LORAS, LORA_PACK_STRENGTH_LOW)
+  const highFinalNodeId = createChain(highBaseNodeId, LORA_PACK_HIGH_LORAS, strengths.high)
+  const lowFinalNodeId = createChain(lowBaseNodeId, LORA_PACK_LOW_LORAS, strengths.low)
 
   for (const node of Object.values(workflow)) {
     if ((node as any)?.class_type !== 'ModelSamplingSD3') continue
@@ -1107,6 +1117,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const prompt = String(input?.prompt ?? input?.text ?? '')
   const negativePrompt = String(input?.negative_prompt ?? input?.negative ?? '')
+  const loraStrengthMode = parseLoraPackStrengthMode(
+    input?.lora_strength_mode ?? input?.enhancement_strength_mode ?? input?.enhancement_strength,
+  )
+  const loraPackStrengths = resolveLoraPackStrengths(loraStrengthMode)
   const steps = isAnimate ? FIXED_STEPS_ANIMATE : isLoraPack ? LORA_PACK_STEPS : FIXED_STEPS
   const cfg = 1
   const width = Math.floor(Number(input?.width ?? 832))
@@ -1159,6 +1173,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     mode,
     seconds,
     ticket_cost: ticketCost,
+    lora_strength_mode: isLoraPack ? loraStrengthMode : undefined,
   }
   if (!isFreeGuestMode && authContext) {
     const ticketCheck = await ensureTicketAvailable(authContext.admin, authContext.user, ticketCost, corsHeaders)
@@ -1175,7 +1190,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   if (isLoraPackRoute(request)) {
-    applyLoraPackStack(workflow as Record<string, any>)
+    applyLoraPackStack(workflow as Record<string, any>, loraPackStrengths)
   }
 
   const nodeMap = await getNodeMap(generationMode).catch(() => null)

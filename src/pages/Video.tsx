@@ -23,6 +23,7 @@ type VideoModelConfig = {
 }
 
 type VideoLengthSeconds = (typeof VIDEO_LENGTH_OPTIONS)[number]['seconds']
+type EnhancementStrengthMode = 'low' | 'high'
 
 type SubmitVideoResult =
   | { videos: string[]; jobId?: never }
@@ -343,6 +344,7 @@ export function Video() {
   const [sourceName, setSourceName] = useState('')
   const [prompt, setPrompt] = useState('')
   const [negativePrompt, setNegativePrompt] = useState('')
+  const [enhancementStrengthMode, setEnhancementStrengthMode] = useState<EnhancementStrengthMode>('low')
   const [videoLengthSeconds, setVideoLengthSeconds] = useState<VideoLengthSeconds>(DEFAULT_VIDEO_LENGTH_SECONDS as VideoLengthSeconds)
   const [width, setWidth] = useState(832)
   const [height, setHeight] = useState(576)
@@ -646,6 +648,7 @@ export function Video() {
         mode: 'i2v',
         prompt,
         negative_prompt: negativePrompt,
+        enhancement_strength: enhancementStrengthMode,
         width,
         height,
         fps: FIXED_FPS,
@@ -700,6 +703,7 @@ export function Video() {
     },
     [
       height,
+      enhancementStrengthMode,
       negativePrompt,
       prompt,
       requiredPointsForRun,
@@ -1040,6 +1044,32 @@ export function Video() {
                   </span>
                 </div>
                 <p className="studio-field-note">標準は5秒です。必要なときだけ8秒オプションへ切り替えます。</p>
+              </div>
+            </section>
+
+            <section className="studio-section">
+              <h2 className="studio-section-title">強化学習の強さ</h2>
+              <div className="studio-duration-row">
+                <span>強さを選択</span>
+                <div className="studio-duration-options studio-duration-options--two" aria-label="強化学習の強さ">
+                  <button
+                    type="button"
+                    className={`studio-duration-option${enhancementStrengthMode === 'low' ? ' is-active' : ''}`}
+                    onClick={() => setEnhancementStrengthMode('low')}
+                    disabled={isRunning}
+                  >
+                    LOW
+                  </button>
+                  <button
+                    type="button"
+                    className={`studio-duration-option${enhancementStrengthMode === 'high' ? ' is-active' : ''}`}
+                    onClick={() => setEnhancementStrengthMode('high')}
+                    disabled={isRunning}
+                  >
+                    HIGH
+                  </button>
+                </div>
+                <p className="studio-field-note">既定はLOWです。HIGHでは low/high の強度を 0.2 に上げます。</p>
               </div>
             </section>
 
