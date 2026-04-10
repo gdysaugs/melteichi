@@ -1069,7 +1069,7 @@ export function Video() {
                     HIGH
                   </button>
                 </div>
-                <p className="studio-field-note">既定はLOWです。HIGHでは low/high の強度を 0.2 に上げます。</p>
+                <p className="studio-field-note">強くすると強化学習が強く反映されるが顔の安定感が落ちます。</p>
               </div>
             </section>
 
