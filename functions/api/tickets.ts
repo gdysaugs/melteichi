@@ -6,7 +6,7 @@ type Env = {
   SUPABASE_SERVICE_ROLE_KEY?: string
 }
 
-const SIGNUP_TICKET_GRANT = 3
+const SIGNUP_TICKET_GRANT = 5
 
 const corsMethods = 'GET, OPTIONS'
 
@@ -175,4 +175,3 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   return jsonResponse({ tickets: data?.tickets ?? 0, hasRecord: Boolean(data) }, 200, corsHeaders)
 }
-

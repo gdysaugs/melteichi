@@ -47,7 +47,7 @@
       ],
       "frame_rate": 10,
       "loop_count": 0,
-      "filename_prefix": "video/akumaai_i2v",
+      "filename_prefix": "video/melteichi_i2v",
       "format": "video/h264-mp4",
       "pix_fmt": "yuv420p",
       "crf": 14,

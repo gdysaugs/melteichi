@@ -23,6 +23,7 @@ npm install
 ```env
 RUNPOD_API_KEY=...
 RUNPOD_WAN_ENDPOINT_URL=https://api.runpod.ai/v2/<endpoint-id>
+RUNPOD_WAN_LORA_PACK_ENDPOINT_URL=https://api.runpod.ai/v2/wwlskoqwe0kyie
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
@@ -55,6 +56,7 @@ npx wrangler pages deploy dist --project-name melteichi --branch main
 
 - `RUNPOD_API_KEY`
 - `RUNPOD_WAN_ENDPOINT_URL`
+- `RUNPOD_WAN_LORA_PACK_ENDPOINT_URL`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 

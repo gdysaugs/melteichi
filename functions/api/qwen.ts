@@ -65,7 +65,7 @@ type NodeMap = Partial<{
   angle_strength: NodeMapValue
 }>
 
-const SIGNUP_TICKET_GRANT = 3
+const SIGNUP_TICKET_GRANT = 5
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 const MAX_PROMPT_LENGTH = 500
 const MAX_NEGATIVE_PROMPT_LENGTH = 500
@@ -1176,5 +1176,4 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     )
   }
 }
-
 

@@ -8,10 +8,19 @@ type Env = {
   STRIPE_SIGNING_SECRET?: string
 }
 
-const PRICE_MAP = new Map([
-  ['price_1TIA1SAHjIANZ9z3a3U015UN', { label: 'お試しパック', tickets: 25 }],
-  ['price_1TIA1jAHjIANZ9z3ReE5aAsV', { label: 'お得パック', tickets: 115 }],
-  ['price_1TIA2LAHjIANZ9z3uNOI1ZQr', { label: '大容量パック', tickets: 600 }],
+const PLAN_MAP = new Map([
+  ['light', { amountJpy: 599, tickets: 30 }],
+  ['standard', { amountJpy: 1799, tickets: 100 }],
+  ['expert', { amountJpy: 3999, tickets: 250 }],
+])
+
+const LEGACY_PRICE_MAP = new Map([
+  ['price_1TKX8BA1siHjiLk36mgjovm4', { amountJpy: 599, tickets: 30 }],
+  ['price_1TKX9tA1siHjiLk3DpAMqVKG', { amountJpy: 1799, tickets: 100 }],
+  ['price_1TKXA7A1siHjiLk30rK61AHP', { amountJpy: 3999, tickets: 250 }],
+  ['price_1TIA1SAHjIANZ9z3a3U015UN', { amountJpy: 470, tickets: 25 }],
+  ['price_1TIA1jAHjIANZ9z3ReE5aAsV', { amountJpy: 1980, tickets: 115 }],
+  ['price_1TIA2LAHjIANZ9z3uNOI1ZQr', { amountJpy: 9980, tickets: 600 }],
 ])
 
 const corsHeaders = {
@@ -113,9 +122,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return jsonResponse({ received: true })
   }
 
+  const planId = String(session.metadata?.plan_id ?? '')
   const priceId = String(session.metadata?.price_id ?? '')
-  const plan = PRICE_MAP.get(priceId)
-  if (!priceId || !plan) {
+  const plan = PLAN_MAP.get(planId) ?? LEGACY_PRICE_MAP.get(priceId)
+  if (!plan) {
     return jsonResponse({ received: true })
   }
 
@@ -146,8 +156,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     p_amount: tickets,
     p_reason: 'stripe_purchase',
     p_metadata: {
+      plan_id: planId || null,
       price_id: priceId,
-      plan_label: plan.label,
+      amount_jpy: plan.amountJpy,
       metadata_tickets: session.metadata?.tickets ?? null,
       session_id: session.id ?? null,
     },

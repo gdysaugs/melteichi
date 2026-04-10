@@ -1,4 +1,4 @@
-﻿import { createClient, type User } from '@supabase/supabase-js'
+import { createClient, type User } from '@supabase/supabase-js'
 import { buildCorsHeaders, isCorsBlocked } from '../_shared/cors'
 
 type Env = {
@@ -6,18 +6,36 @@ type Env = {
   SUPABASE_SERVICE_ROLE_KEY?: string
 }
 
+type DailyBonusStatusRow = {
+  can_claim?: unknown
+  next_eligible_at?: unknown
+  remaining_seconds?: unknown
+  bonus_slot?: unknown
+  amount?: unknown
+  cooldown_hours?: unknown
+}
+
+type DailyBonusClaimRow = DailyBonusStatusRow & {
+  granted?: unknown
+  tickets_left?: unknown
+}
+
+type TicketEventRow = {
+  created_at?: unknown
+}
+
 const corsMethods = 'POST, GET, OPTIONS'
 const BONUS_COOLDOWN_HOURS = 24
-const BONUS_COOLDOWN_MS = BONUS_COOLDOWN_HOURS * 60 * 60 * 1000
 const BONUS_AMOUNT = 3
-const DAILY_BONUS_REASONS = ['daily_bonus', 'daily_bonus_claim']
+const BONUS_COOLDOWN_SECONDS = BONUS_COOLDOWN_HOURS * 60 * 60
+const BONUS_COOLDOWN_MS = BONUS_COOLDOWN_SECONDS * 1000
+const DAILY_BONUS_REASONS = ['daily_bonus', 'daily_bonus_claim', 'daily_bonus_fallback'] as const
 
-const INTERNAL_SERVER_ERROR_MESSAGE = '\u30b5\u30fc\u30d0\u30fc\u5185\u90e8\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\u6642\u9593\u3092\u304a\u3044\u3066\u518d\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002'
-const ERROR_LOGIN_REQUIRED = '\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002'
-const ERROR_AUTH_FAILED = '\u8a8d\u8a3c\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002'
-const ERROR_GOOGLE_ONLY = 'Google\u30ed\u30b0\u30a4\u30f3\u306e\u307f\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u3059\u3002'
-const ERROR_SUPABASE_NOT_SET =
-  'SUPABASE_URL \u307e\u305f\u306f SUPABASE_SERVICE_ROLE_KEY \u304c\u8a2d\u5b9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002'
+const INTERNAL_SERVER_ERROR_MESSAGE = 'サーバー内部エラーが発生しました。時間をおいて再度お試しください。'
+const ERROR_LOGIN_REQUIRED = 'ログインが必要です。'
+const ERROR_AUTH_FAILED = '認証に失敗しました。'
+const ERROR_GOOGLE_ONLY = 'Googleログインのみ対応しています。'
+const ERROR_SUPABASE_NOT_SET = 'SUPABASE_URL または SUPABASE_SERVICE_ROLE_KEY が設定されていません。'
 
 const jsonResponse = (body: unknown, status = 200, headers: HeadersInit = {}) =>
   new Response(JSON.stringify(body), {
@@ -53,112 +71,231 @@ const requireGoogleUser = async (request: Request, env: Env, corsHeaders: Header
   if (!token) {
     return { response: jsonResponse({ error: ERROR_LOGIN_REQUIRED }, 401, corsHeaders) }
   }
+
   const admin = getSupabaseAdmin(env)
   if (!admin) {
     return { response: jsonResponse({ error: ERROR_SUPABASE_NOT_SET }, 500, corsHeaders) }
   }
+
   const { data, error } = await admin.auth.getUser(token)
   if (error || !data?.user) {
     return { response: jsonResponse({ error: ERROR_AUTH_FAILED }, 401, corsHeaders) }
   }
+
   if (!isGoogleUser(data.user)) {
     return { response: jsonResponse({ error: ERROR_GOOGLE_ONLY }, 403, corsHeaders) }
   }
+
   return { admin, user: data.user }
 }
 
-const fetchLatestClaimAt = async (
-  admin: ReturnType<typeof createClient>,
-  userId: string,
-  email: string,
-) => {
-  const byUser = await admin
+const pickFirstRow = <T>(value: T | T[] | null | undefined) => {
+  if (Array.isArray(value)) return value[0] ?? null
+  return value ?? null
+}
+
+const asInteger = (value: unknown, fallback = 0) => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : fallback
+}
+
+const asIsoString = (value: unknown) => (typeof value === 'string' && value ? value : null)
+
+const hasCooldownElapsed = (nextEligibleAt: string | null, remainingSeconds: number) => {
+  if (remainingSeconds > 0) return false
+  if (!nextEligibleAt) return true
+  const nextEligibleTime = new Date(nextEligibleAt).getTime()
+  return Number.isFinite(nextEligibleTime) && nextEligibleTime <= Date.now()
+}
+
+const toRemainingSeconds = (nextEligibleAt: string | null) => {
+  if (!nextEligibleAt) return 0
+  const next = new Date(nextEligibleAt).getTime()
+  if (!Number.isFinite(next)) return 0
+  return Math.max(0, Math.ceil((next - Date.now()) / 1000))
+}
+
+const computeClaimCooldown = async (admin: ReturnType<typeof createClient>, userId: string) => {
+  const { data, error } = await admin
     .from('ticket_events')
     .select('created_at')
     .eq('user_id', userId)
-    .in('reason', DAILY_BONUS_REASONS)
+    .in('reason', [...DAILY_BONUS_REASONS])
+    .gt('delta', 0)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
-  if (byUser.error) return { error: byUser.error, createdAt: null as string | null }
-  if (byUser.data?.created_at) return { error: null, createdAt: String(byUser.data.created_at) }
-  if (!email) return { error: null, createdAt: null as string | null }
+  if (error) {
+    return null
+  }
 
-  const byEmail = await admin
-    .from('ticket_events')
-    .select('created_at')
-    .eq('email', email)
-    .in('reason', DAILY_BONUS_REASONS)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const row = data as TicketEventRow | null
+  const lastClaimAtRaw = typeof row?.created_at === 'string' ? row.created_at : ''
+  if (!lastClaimAtRaw) {
+    return { active: false, nextEligibleAt: null, remainingSeconds: 0 }
+  }
 
-  if (byEmail.error) return { error: byEmail.error, createdAt: null as string | null }
-  return { error: null, createdAt: byEmail.data?.created_at ? String(byEmail.data.created_at) : null }
+  const lastClaimAt = new Date(lastClaimAtRaw).getTime()
+  if (!Number.isFinite(lastClaimAt)) {
+    return { active: false, nextEligibleAt: null, remainingSeconds: 0 }
+  }
+
+  const nextEligibleAt = new Date(lastClaimAt + BONUS_COOLDOWN_MS).toISOString()
+  const remainingSeconds = toRemainingSeconds(nextEligibleAt)
+  return {
+    active: remainingSeconds > 0,
+    nextEligibleAt,
+    remainingSeconds,
+  }
 }
 
-const parseTimeMs = (value: string | null | undefined) => {
-  if (!value) return null
-  const ms = new Date(value).getTime()
-  return Number.isFinite(ms) ? ms : null
+const normalizeStatusRow = (row: DailyBonusStatusRow) => {
+  const nextEligibleAt = asIsoString(row.next_eligible_at)
+  const remainingSeconds = asInteger(row.remaining_seconds, 0)
+  return {
+    canClaim: Boolean(row.can_claim) || hasCooldownElapsed(nextEligibleAt, remainingSeconds),
+    nextEligibleAt,
+    remainingSeconds,
+    bonusSlot: asInteger(row.bonus_slot, 0),
+    amount: asInteger(row.amount, BONUS_AMOUNT),
+    cooldownHours: asInteger(row.cooldown_hours, BONUS_COOLDOWN_HOURS),
+  }
 }
 
-const buildBonusStatus = (latestClaimAt: string | null, userCreatedAt: string | null) => {
+const normalizeClaimRow = (row: DailyBonusClaimRow) => ({
+  ...normalizeStatusRow(row),
+  granted: Boolean(row.granted),
+  ticketsLeft: row.tickets_left == null ? null : asInteger(row.tickets_left, 0),
+})
+
+type FallbackStatus = {
+  canClaim: boolean
+  nextEligibleAt: string | null
+  remainingSeconds: number
+  bonusSlot: number
+  amount: number
+  cooldownHours: number
+}
+
+const computeFallbackStatus = async (
+  admin: ReturnType<typeof createClient>,
+  user: User,
+): Promise<FallbackStatus | null> => {
+  const createdAtRaw = (user as User & { created_at?: string }).created_at
+  const createdAtTime = createdAtRaw ? new Date(createdAtRaw).getTime() : NaN
+  if (!Number.isFinite(createdAtTime)) {
+    return null
+  }
+
   const now = Date.now()
-  const createdMs = parseTimeMs(userCreatedAt)
-  const lastClaimMs = parseTimeMs(latestClaimAt)
-  const initialEligibleMs = createdMs !== null ? createdMs + BONUS_COOLDOWN_MS : null
-  const claimEligibleMs = lastClaimMs !== null ? lastClaimMs + BONUS_COOLDOWN_MS : null
+  const firstEligibleAtTime = createdAtTime + BONUS_COOLDOWN_MS
 
-  let nextMs: number | null = null
-  if (initialEligibleMs !== null) {
-    nextMs = initialEligibleMs
-  }
-  if (claimEligibleMs !== null) {
-    nextMs = nextMs === null ? claimEligibleMs : Math.max(nextMs, claimEligibleMs)
-  }
-
-  if (nextMs === null) {
+  if (now < firstEligibleAtTime) {
+    const nextEligibleAt = new Date(firstEligibleAtTime).toISOString()
     return {
-      canClaim: true,
-      nextEligibleAt: null as string | null,
-      remainingSeconds: 0,
+      canClaim: false,
+      nextEligibleAt,
+      remainingSeconds: toRemainingSeconds(nextEligibleAt),
+      bonusSlot: 0,
+      amount: BONUS_AMOUNT,
+      cooldownHours: BONUS_COOLDOWN_HOURS,
     }
   }
 
-  const diff = nextMs - now
-  if (diff <= 0) {
+  const bonusSlot = Math.floor((now - createdAtTime) / BONUS_COOLDOWN_MS)
+  const currentUsageIds = [
+    `daily_bonus:${user.id}:${bonusSlot}`,
+    `daily_bonus_fallback:${user.id}:${bonusSlot}`,
+  ]
+
+  const { data: existingEvent, error } = await admin
+    .from('ticket_events')
+    .select('id')
+    .eq('user_id', user.id)
+    .in('usage_id', currentUsageIds)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    return null
+  }
+
+  if (existingEvent) {
+    const nextEligibleAt = new Date(createdAtTime + (bonusSlot + 1) * BONUS_COOLDOWN_MS).toISOString()
     return {
-      canClaim: true,
-      nextEligibleAt: null as string | null,
-      remainingSeconds: 0,
+      canClaim: false,
+      nextEligibleAt,
+      remainingSeconds: toRemainingSeconds(nextEligibleAt),
+      bonusSlot,
+      amount: BONUS_AMOUNT,
+      cooldownHours: BONUS_COOLDOWN_HOURS,
     }
   }
 
   return {
-    canClaim: false,
-    nextEligibleAt: new Date(nextMs).toISOString(),
-    remainingSeconds: Math.ceil(diff / 1000),
+    canClaim: true,
+    nextEligibleAt: null,
+    remainingSeconds: 0,
+    bonusSlot,
+    amount: BONUS_AMOUNT,
+    cooldownHours: BONUS_COOLDOWN_HOURS,
   }
 }
 
-const getDailyBonusStatus = async (
+const claimFallbackBonus = async (
   admin: ReturnType<typeof createClient>,
   user: User,
+  status: FallbackStatus,
 ) => {
-  const email = user.email ?? ''
-  const userCreatedAt = typeof user.created_at === 'string' ? user.created_at : null
-  const latest = await fetchLatestClaimAt(admin, user.id, email)
-  if (latest.error) {
-    return { error: latest.error, status: null as null | ReturnType<typeof buildBonusStatus> }
+  if (!status.canClaim || status.bonusSlot <= 0) {
+    const nextEligibleAt =
+      status.nextEligibleAt ??
+      new Date(Date.now() + BONUS_COOLDOWN_MS).toISOString()
+    return {
+      granted: false,
+      ticketsLeft: null,
+      nextEligibleAt,
+      remainingSeconds: toRemainingSeconds(nextEligibleAt),
+      bonusSlot: status.bonusSlot,
+      amount: BONUS_AMOUNT,
+      cooldownHours: BONUS_COOLDOWN_HOURS,
+    }
   }
-  return { error: null, status: buildBonusStatus(latest.createdAt, userCreatedAt) }
-}
 
-const buildDailyBonusUsageId = (userId: string) => {
-  const slot = Math.floor(Date.now() / BONUS_COOLDOWN_MS)
-  return `daily_bonus:${userId}:${slot}`
+  const email = user.email
+  if (!email) return null
+
+  const usageId = `daily_bonus_fallback:${user.id}:${status.bonusSlot}`
+  const { data, error } = await admin.rpc('grant_tickets', {
+    p_usage_id: usageId,
+    p_user_id: user.id,
+    p_email: email,
+    p_amount: BONUS_AMOUNT,
+    p_reason: 'daily_bonus_fallback',
+    p_metadata: {
+      source: 'daily_bonus_fallback',
+      bonus_slot: status.bonusSlot,
+      cooldown_hours: BONUS_COOLDOWN_HOURS,
+    },
+    p_stripe_customer_id: null,
+  })
+
+  if (error) {
+    return null
+  }
+
+  const row = pickFirstRow<{ tickets_left?: unknown; already_processed?: unknown }>(data)
+  const nextEligibleAt = new Date(Date.now() + BONUS_COOLDOWN_MS).toISOString()
+  return {
+    granted: !Boolean(row?.already_processed),
+    ticketsLeft: row?.tickets_left == null ? null : asInteger(row.tickets_left, 0),
+    nextEligibleAt,
+    remainingSeconds: toRemainingSeconds(nextEligibleAt),
+    bonusSlot: status.bonusSlot,
+    amount: BONUS_AMOUNT,
+    cooldownHours: BONUS_COOLDOWN_HOURS,
+  }
 }
 
 export const onRequestOptions: PagesFunction<Env> = async ({ request, env }) => {
@@ -180,18 +317,48 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     return auth.response
   }
 
-  const statusResult = await getDailyBonusStatus(auth.admin, auth.user)
-  if (statusResult.error || !statusResult.status) {
-    return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+  const { data, error } = await auth.admin.rpc('get_daily_bonus_status', {
+    p_user_id: auth.user.id,
+  })
+  let status: FallbackStatus
+  if (error) {
+    console.error('daily-bonus:get rpc get_daily_bonus_status failed', error)
+    const fallback = await computeFallbackStatus(auth.admin, auth.user)
+    if (!fallback) {
+      return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+    }
+    status = fallback
+  } else {
+    const statusRow = pickFirstRow<DailyBonusStatusRow>(data)
+    if (!statusRow) {
+      const fallback = await computeFallbackStatus(auth.admin, auth.user)
+      if (!fallback) {
+        return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+      }
+      status = fallback
+    } else {
+      status = normalizeStatusRow(statusRow)
+    }
+  }
+
+  const claimCooldown = await computeClaimCooldown(auth.admin, auth.user.id)
+  if (claimCooldown?.active) {
+    status = {
+      ...status,
+      canClaim: false,
+      nextEligibleAt: claimCooldown.nextEligibleAt,
+      remainingSeconds: claimCooldown.remainingSeconds,
+      cooldownHours: BONUS_COOLDOWN_HOURS,
+    }
   }
 
   return jsonResponse(
     {
-      can_claim: statusResult.status.canClaim,
-      next_eligible_at: statusResult.status.nextEligibleAt,
-      remaining_seconds: statusResult.status.remainingSeconds,
-      cooldown_hours: BONUS_COOLDOWN_HOURS,
-      amount: BONUS_AMOUNT,
+      can_claim: status.canClaim,
+      next_eligible_at: status.nextEligibleAt,
+      remaining_seconds: status.remainingSeconds,
+      cooldown_hours: status.cooldownHours,
+      amount: status.amount,
     },
     200,
     corsHeaders,
@@ -209,64 +376,87 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return auth.response
   }
 
-  const statusResult = await getDailyBonusStatus(auth.admin, auth.user)
-  if (statusResult.error || !statusResult.status) {
-    return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
-  }
-
-  if (!statusResult.status.canClaim) {
+  const claimCooldown = await computeClaimCooldown(auth.admin, auth.user.id)
+  if (claimCooldown?.active) {
     return jsonResponse(
       {
         granted: false,
         can_claim: false,
-        next_eligible_at: statusResult.status.nextEligibleAt,
-        remaining_seconds: statusResult.status.remainingSeconds,
+        next_eligible_at: claimCooldown.nextEligibleAt,
+        remaining_seconds: claimCooldown.remainingSeconds,
         reason: 'cooldown',
         cooldown_hours: BONUS_COOLDOWN_HOURS,
         amount: BONUS_AMOUNT,
+        tickets_left: null,
       },
       200,
       corsHeaders,
     )
   }
 
-  const email = auth.user.email ?? ''
-  const usageId = buildDailyBonusUsageId(auth.user.id)
-  const { data, error } = await auth.admin.rpc('grant_tickets', {
-    p_usage_id: usageId,
+  const { data, error } = await auth.admin.rpc('claim_daily_bonus', {
     p_user_id: auth.user.id,
-    p_email: email,
-    p_amount: BONUS_AMOUNT,
-    p_reason: 'daily_bonus',
-    p_metadata: {
-      source: 'daily_bonus',
-      cooldown_hours: BONUS_COOLDOWN_HOURS,
-    },
   })
+  let result:
+    | ReturnType<typeof normalizeClaimRow>
+    | {
+        granted: boolean
+        canClaim: boolean
+        nextEligibleAt: string | null
+        remainingSeconds: number
+        bonusSlot: number
+        amount: number
+        cooldownHours: number
+        ticketsLeft: number | null
+      }
 
   if (error) {
-    return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+    console.error('daily-bonus:post rpc claim_daily_bonus failed', error)
+    const fallbackStatus = await computeFallbackStatus(auth.admin, auth.user)
+    if (!fallbackStatus) {
+      return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+    }
+    const fallbackClaim = await claimFallbackBonus(auth.admin, auth.user, fallbackStatus)
+    if (!fallbackClaim) {
+      return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+    }
+    result = {
+      ...fallbackClaim,
+      canClaim: false,
+    }
+  } else {
+    const claimRow = pickFirstRow<DailyBonusClaimRow>(data)
+    if (!claimRow) {
+      return jsonResponse({ error: INTERNAL_SERVER_ERROR_MESSAGE }, 500, corsHeaders)
+    }
+    result = normalizeClaimRow(claimRow)
   }
 
-  const result = Array.isArray(data) ? data[0] : data
-  const alreadyProcessed = Boolean(result?.already_processed)
-  const ticketsLeftRaw = Number(result?.tickets_left)
-  const nextEligibleAt = new Date(Date.now() + BONUS_COOLDOWN_MS).toISOString()
+  if (result.granted) {
+    const nextEligibleAt = new Date(Date.now() + BONUS_COOLDOWN_MS).toISOString()
+    result = {
+      ...result,
+      canClaim: false,
+      nextEligibleAt,
+      remainingSeconds: BONUS_COOLDOWN_SECONDS,
+      cooldownHours: BONUS_COOLDOWN_HOURS,
+    }
+  }
+
+  const reason = result.granted ? 'granted' : result.bonusSlot <= 0 ? 'not_eligible_yet' : 'cooldown'
+
   return jsonResponse(
     {
-      granted: !alreadyProcessed,
+      granted: result.granted,
       can_claim: false,
-      next_eligible_at: nextEligibleAt,
-      remaining_seconds: Math.ceil(BONUS_COOLDOWN_MS / 1000),
-      reason: alreadyProcessed ? 'cooldown' : 'granted',
-      cooldown_hours: BONUS_COOLDOWN_HOURS,
-      amount: BONUS_AMOUNT,
-      tickets_left: Number.isFinite(ticketsLeftRaw) ? ticketsLeftRaw : null,
+      next_eligible_at: result.nextEligibleAt,
+      remaining_seconds: result.remainingSeconds,
+      reason,
+      cooldown_hours: result.cooldownHours,
+      amount: result.amount,
+      tickets_left: result.ticketsLeft,
     },
     200,
     corsHeaders,
   )
 }
-
-
-

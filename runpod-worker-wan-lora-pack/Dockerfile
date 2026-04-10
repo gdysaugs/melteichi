@@ -1,4 +1,4 @@
-FROM suarez123/wan22-i2v:v2026.03.17-190559-18899
+FROM suarez123/wan-i2v-gguf:remix-v2
 
 ENV LORA_HIGH_WEIGHT=0.5
 ENV LORA_LOW_WEIGHT=0.3

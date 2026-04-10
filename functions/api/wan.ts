@@ -31,8 +31,8 @@ const jsonResponse = (body: unknown, status = 200, headers: HeadersInit = {}) =>
   })
 
 const DEFAULT_LORA_PACK_ENDPOINT = 'https://api.runpod.ai/v2/rywgsws0odibjj'
-const LORA_PACK_STRENGTH_HIGH = 0.3
-const LORA_PACK_STRENGTH_LOW = 0.3
+const LORA_PACK_STRENGTH_HIGH = 0.1
+const LORA_PACK_STRENGTH_LOW = 0.1
 
 const LORA_PACK_HIGH_LORAS = [
   'iGoon - Blink_Back_Doggystyle_HIGH.safetensors',
@@ -42,7 +42,6 @@ const LORA_PACK_HIGH_LORAS = [
   'iGOON_Blink_Blowjob_I2V_HIGH%281%29.safetensors',
   'iGoon_Blink_Missionary_I2V_HIGH%20v2.safetensors',
   'Blink_Squatting_Cowgirl_Position_I2V_HIGH.safetensors',
-  'sid3l3g_transition_v2.0_H.safetensors',
 ] as const
 
 const LORA_PACK_LOW_LORAS = [
@@ -53,7 +52,6 @@ const LORA_PACK_LOW_LORAS = [
   'iGOON_Blink_Blowjob_I2V_LOW%281%29.safetensors',
   'iGoon%20-%20Blink_Missionary_I2V_LOW%20v2.safetensors',
   'iGoon%20-%20Blink_Squatting_Cowgirl_Position_I2V_LOW.safetensors',
-  'sid3l3g_transition_v2.0_L.safetensors',
 ] as const
 
 const isLoraPackRoute = (request: Request) => new URL(request.url).pathname.toLowerCase().includes('/api/wan-lora-pack')
@@ -117,7 +115,7 @@ const resolveI2VVariant = (request: Request): I2VVariant => {
   return path.includes('/api/wan-dasiwa') ? 'dasiwa' : 'default'
 }
 
-const SIGNUP_TICKET_GRANT = 3
+const SIGNUP_TICKET_GRANT = 5
 const DEFAULT_VIDEO_TICKET_COST = 1
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 const MAX_VIDEO_BYTES = 150 * 1024 * 1024
@@ -148,8 +146,7 @@ const VIDEO_DURATION_OPTIONS_DASIWA = [
 ] as const
 const VIDEO_DURATION_OPTIONS_LORA_PACK = [
   { seconds: 5, frames: 53, ticketCost: 1 },
-  { seconds: 7, frames: 73, ticketCost: 2 },
-  { seconds: 10, frames: 101, ticketCost: 3 },
+  { seconds: 8, frames: 81, ticketCost: 3 },
 ] as const
 const FIXED_ANIMATE_FRAMES = 77
 const INTERNAL_SERVER_ERROR_MESSAGE = '\u30b5\u30fc\u30d0\u30fc\u5185\u90e8\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\u6642\u9593\u3092\u304a\u3044\u3066\u518d\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002'
@@ -271,7 +268,10 @@ const requireOwnedUsageChargeEvent = async (
   }
   return { event }
 }
-const getWorkflowTemplate = async (mode: GenerationMode, i2vVariant: I2VVariant = 'default') =>
+const getWorkflowTemplate = async (
+  mode: GenerationMode,
+  i2vVariant: I2VVariant = 'default',
+) =>
   (mode === 'animate'
     ? workflowAnimateTemplate
     : i2vVariant === 'dasiwa'

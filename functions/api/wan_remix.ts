@@ -85,7 +85,7 @@ type NodeMap = Partial<{
   end_step: NodeMapValue
 }>
 
-const SIGNUP_TICKET_GRANT = 3
+const SIGNUP_TICKET_GRANT = 5
 const LOW_QUALITY_TICKET_COST = 0
 const MEDIUM_QUALITY_TICKET_COST = 1
 const HIGH_QUALITY_TICKET_COST = 2

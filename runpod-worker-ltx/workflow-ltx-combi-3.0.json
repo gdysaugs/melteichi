@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "cb6ca464-e1f0-4cf4-8770-b0fdd201b940",
   "revision": 0,
   "last_node_id": 1685,
@@ -3682,7 +3682,7 @@
         }
       },
       "widgets_values": [
-        "**Workflow Page:** [Workflow](https://akumaai.cc/models/2354193/ltx-2-all-in-one-workflow-textimagevideoaudio-to-video-running-on-rtx-3060-with-12-gb-vram-32-gb-ram?modelVersionId=2647783\n)\n\n\n**Diffusion Model**       \n- [ltx-2-3-22b-dev-Q4_K_M.gguf](https://huggingface.co/vantagewithai/LTX-2.3-GGUF/blob/main/dev/ltx-2-3-22b-dev-Q4_K_M.gguf)\n\n**Text Encoder**\n- [gemma_3_12B_it_fp4_mixed.safetensors](https://huggingface.co/Comfy-Org/ltx-2/blob/main/split_files/text_encoders/gemma_3_12B_it_fp4_mixed.safetensors)\n\n\n**Dual Clip Connector**\n- [ltx-2.3_text_projection_bf16.safetensors](https://huggingface.co/Kijai/LTX2.3_comfy/blob/main/text_encoders/ltx-2.3_text_projection_bf16.safetensors)\n\n**Audio VAE**\n- [LTX23_audio_vae_bf16.safetensors](https://huggingface.co/Kijai/LTX2.3_comfy/blob/main/vae/LTX23_audio_vae_bf16.safetensors)\n\n**Video VAE**   \n- [LTX23_video_vae_bf16.safetensors](https://huggingface.co/Kijai/LTX2.3_comfy/blob/main/vae/LTX23_video_vae_bf16.safetensors)\n\n**Spatial Upscaler**   \n- [ltx-2.3-spatial-upscaler-x2-1.1.safetensors](https://huggingface.co/Lightricks/LTX-2.3/tree/main)\n\n**Tiny VAE for previews**   \n- [taeltx2_3.safetensors](https://github.com/madebyollin/taehv/blob/main/safetensors/taeltx2_3.safetensors)\n\n**Destilled Lora**   \n- [ltx-2.3-22b-distilled-lora-dynamic_fro09_avg_rank_105_bf16.safetensors](https://huggingface.co/Kijai/LTX2.3_comfy/tree/main/loras)\n\n\n\n\n\nFile save location\n\n```\nComfyUI/\n├───📂 models/\n│   ├───📂 diffusion_models/\n│   │   └─── ltx-2-3-22b-dev-Q4_K_M.gguf\n│   │\n│   ├───📂 clip/\n│   │   ├─── gemma_3_12B_it_fp4_mixed.safetensors\n│   │   └─── ltx-2.3_text_projection_bf16.safetensors\n│   │\n│   ├───📂 VAE/\n│   │   └─── LTX2_audio_vae_bf16.safetensors\n│   │   └─── LTX2_video_vae_bf16.safetensors\n│   │   └─── taeltx2_3.safetensors\n│   │\n│   ├───📂 latent_upscale_models/\n│   │   └─── ltx-2.3-spatial-upscaler-x2-1.1.safetensors\n│   │\n│   └───📂 Lora/\n│       └─── ltx-2.3-22b-distilled-lora-dynamic_fro09_avg_rank_105_bf16.safetensors\n```\n"
+        "Original upstream workflow notes removed for MeltAI-H packaging."
       ],
       "color": "#432",
       "bgcolor": "#653"
@@ -3742,7 +3742,7 @@
         }
       },
       "widgets_values": [
-        "This workflow is mainly based on the fantastic LTX-2.3 workflows of Urabewe:\nhttps://akumaai.cc/models/2443867/ltx-23-22b-gguf-workflows-12gb-vram.\nAs far as I know, those were the first workflows running LTX-2 with 12 GB VRAM. All credits goes to the original creator.\n\nMy job was only to combine and organise the different workflows in a simple to use all-in-one design.\nWith workflow version 3.0 I created a pretty complex swich logic \"under the hood\" to manage all options and keep the \"user interface\" as simple as possible.\n\nThe new version now strictly adheres to the LTX 2.3 specifications for aspect ratios and should deliver significantly better results (less artefacts, distortions, etc.). \n\n\n\n\n\n\n\n"
+        "Original upstream workflow attribution retained in project history; external legacy references removed for MeltAI-H packaging."
       ],
       "color": "#432",
       "bgcolor": "#653"
@@ -11972,7 +11972,7 @@
                 ]
               }
             ],
-            "title": "🔀 hight t2v [[P:01 Text to Video]]",
+            "title": "楳 hight t2v [[P:01 Text to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -12079,7 +12079,7 @@
                 ]
               }
             ],
-            "title": "🔀 portrait",
+            "title": "楳 portrait",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -13135,46 +13135,46 @@
             ],
             "outputs": [
               {
-                "localized_name": "source_fps🟨",
-                "name": "source_fps🟨",
+                "localized_name": "source_fps洽",
+                "name": "source_fps洽",
                 "type": "FLOAT",
                 "links": []
               },
               {
-                "localized_name": "source_frame_count🟨",
-                "name": "source_frame_count🟨",
+                "localized_name": "source_frame_count洽",
+                "name": "source_frame_count洽",
                 "type": "INT",
                 "links": null
               },
               {
-                "localized_name": "source_duration🟨",
-                "name": "source_duration🟨",
+                "localized_name": "source_duration洽",
+                "name": "source_duration洽",
                 "type": "FLOAT",
                 "links": null
               },
               {
-                "localized_name": "source_width🟨",
-                "name": "source_width🟨",
+                "localized_name": "source_width洽",
+                "name": "source_width洽",
                 "type": "INT",
                 "links": null
               },
               {
-                "localized_name": "source_height🟨",
-                "name": "source_height🟨",
+                "localized_name": "source_height洽",
+                "name": "source_height洽",
                 "type": "INT",
                 "links": null
               },
               {
-                "localized_name": "loaded_fps🟦",
-                "name": "loaded_fps🟦",
+                "localized_name": "loaded_fps洶",
+                "name": "loaded_fps洶",
                 "type": "FLOAT",
                 "links": [
                   2387
                 ]
               },
               {
-                "localized_name": "loaded_frame_count🟦",
-                "name": "loaded_frame_count🟦",
+                "localized_name": "loaded_frame_count洶",
+                "name": "loaded_frame_count洶",
                 "type": "INT",
                 "links": [
                   2581,
@@ -13182,22 +13182,22 @@
                 ]
               },
               {
-                "localized_name": "loaded_duration🟦",
-                "name": "loaded_duration🟦",
+                "localized_name": "loaded_duration洶",
+                "name": "loaded_duration洶",
                 "type": "FLOAT",
                 "links": [
                   2389
                 ]
               },
               {
-                "localized_name": "loaded_width🟦",
-                "name": "loaded_width🟦",
+                "localized_name": "loaded_width洶",
+                "name": "loaded_width洶",
                 "type": "INT",
                 "links": null
               },
               {
-                "localized_name": "loaded_height🟦",
-                "name": "loaded_height🟦",
+                "localized_name": "loaded_height洶",
+                "name": "loaded_height洶",
                 "type": "INT",
                 "links": null
               }
@@ -13541,7 +13541,7 @@
                 ]
               }
             ],
-            "title": "🔀 portrait",
+            "title": "楳 portrait",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -13767,7 +13767,7 @@
                 ]
               }
             ],
-            "title": "🔀 hight [[P:02 Image to Video]]",
+            "title": "楳 hight [[P:02 Image to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -14206,7 +14206,7 @@
                 ]
               }
             ],
-            "title": "🔀 width t2v [[P:01 Text to Video]]",
+            "title": "楳 width t2v [[P:01 Text to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -14283,7 +14283,7 @@
                 ]
               }
             ],
-            "title": "🔀 width [[P:03 Video to Video]]",
+            "title": "楳 width [[P:03 Video to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -14451,7 +14451,7 @@
                 ]
               }
             ],
-            "title": "🔀 hight [[P:03 Video to Video]]",
+            "title": "楳 hight [[P:03 Video to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -15311,7 +15311,7 @@
                 ]
               }
             ],
-            "title": "🔀 width [[P:02 Image to Video]]",
+            "title": "楳 width [[P:02 Image to Video]]",
             "properties": {
               "cnr_id": "ControlFlowUtils",
               "ver": "b675bc6c2c6847d53d8a010fed1497a1b565c144",
@@ -18567,7 +18567,7 @@
         },
         "class_type": "LTXVGemmaCLIPModelLoader",
         "_meta": {
-          "title": "🅛🅣🅧 Gemma 3 Model Loader"
+          "title": "・・・ Gemma 3 Model Loader"
         }
       },
       "3": {
@@ -18653,7 +18653,7 @@
         },
         "class_type": "LTXVAudioVAELoader",
         "_meta": {
-          "title": "🅛🅣🅧 LTXV Audio VAE Loader"
+          "title": "・・・ LTXV Audio VAE Loader"
         }
       },
       "14": {
@@ -18669,7 +18669,7 @@
         },
         "class_type": "LTXVAudioVAEDecode",
         "_meta": {
-          "title": "🅛🅣🅧 LTXV Audio VAE Decode"
+          "title": "・・・ LTXV Audio VAE Decode"
         }
       },
       "15": {
@@ -18698,7 +18698,7 @@
         },
         "class_type": "VHS_VideoCombine",
         "_meta": {
-          "title": "Video Combine 🎥🅥🅗🅢"
+          "title": "Video Combine 磁・・・"
         }
       },
       "17": {
@@ -18723,7 +18723,7 @@
         },
         "class_type": "MultimodalGuider",
         "_meta": {
-          "title": "🅛🅣🅧 Multimodal Guider"
+          "title": "・・・ Multimodal Guider"
         }
       },
       "18": {
@@ -18740,7 +18740,7 @@
         },
         "class_type": "GuiderParameters",
         "_meta": {
-          "title": "🅛🅣🅧 Guider Parameters"
+          "title": "・・・ Guider Parameters"
         }
       },
       "19": {
@@ -18753,7 +18753,7 @@
         },
         "class_type": "GuiderParameters",
         "_meta": {
-          "title": "🅛🅣🅧 Guider Parameters"
+          "title": "・・・ Guider Parameters"
         }
       },
       "21": {
@@ -18812,7 +18812,7 @@
         },
         "class_type": "LTXVEmptyLatentAudio",
         "_meta": {
-          "title": "🅛🅣🅧 LTXV Empty Latent Audio"
+          "title": "・・・ LTXV Empty Latent Audio"
         }
       },
       "27": {
@@ -18841,7 +18841,7 @@
         },
         "class_type": "LTXVConcatAVLatent",
         "_meta": {
-          "title": "🅛🅣🅧 LTXV Concat AV Latent"
+          "title": "・・・ LTXV Concat AV Latent"
         }
       },
       "29": {
@@ -18857,7 +18857,7 @@
         },
         "class_type": "LTXVSeparateAVLatent",
         "_meta": {
-          "title": "🅛🅣🅧 LTXV Separate AV Latent"
+          "title": "・・・ LTXV Separate AV Latent"
         }
       },
       "41": {

@@ -11,25 +11,25 @@ export function Tokushoho() {
         <section className="legal-card">
           <h1>特定商取引法に基づく表記</h1>
           <p>
-            本表記は、AkumaAIが提供するデジタルサービス（ポイント購入・動画生成機能等）に関する取引条件を示すものです。
+            本表記は、MeltAI-Hが提供するデジタルサービス（Gem購入・動画生成機能等）に関する取引条件を示すものです。
           </p>
 
           <div className="legal-table">
             <div className="legal-row">
               <div className="legal-key">販売事業者</div>
-              <div className="legal-value">AkumaAI</div>
+              <div className="legal-value">加藤拓巳</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">運営責任者</div>
-              <div className="legal-value">森世羅</div>
+              <div className="legal-value">加藤拓巳</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">所在地</div>
-              <div className="legal-value">Section1,Changan East Road</div>
+              <div className="legal-value">愛知県一宮市今伊勢町本神戸目久井472-1</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">電話番号</div>
-              <div className="legal-value">090640001211</div>
+              <div className="legal-value">09041570958</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">問い合わせ先</div>
@@ -73,7 +73,7 @@ export function Tokushoho() {
             </div>
             <div className="legal-row">
               <div className="legal-key">特別条件</div>
-              <div className="legal-value">キャンペーン・無料付与ポイント等の条件は、告知なく変更・終了する場合があります</div>
+              <div className="legal-value">キャンペーン・無料付与Gem等の条件は、告知なく変更・終了する場合があります</div>
             </div>
           </div>
 

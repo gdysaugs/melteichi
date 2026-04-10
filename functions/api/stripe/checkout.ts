@@ -80,10 +80,19 @@ const requireGoogleUser = async (request: Request, env: Env, corsHeaders: Header
   return { admin, user: data.user }
 }
 
-const PRICE_MAP = new Map([
-  ['price_1TIA1SAHjIANZ9z3a3U015UN', { label: 'お試しパック', tickets: 25 }],
-  ['price_1TIA1jAHjIANZ9z3ReE5aAsV', { label: 'お得パック', tickets: 115 }],
-  ['price_1TIA2LAHjIANZ9z3uNOI1ZQr', { label: '大容量パック', tickets: 600 }],
+const PLAN_MAP = new Map([
+  ['light', { amountJpy: 599, tickets: 30, priceId: 'price_1TKX8BA1siHjiLk36mgjovm4' }],
+  ['standard', { amountJpy: 1799, tickets: 100, priceId: 'price_1TKX9tA1siHjiLk3DpAMqVKG' }],
+  ['expert', { amountJpy: 3999, tickets: 250, priceId: 'price_1TKXA7A1siHjiLk30rK61AHP' }],
+])
+
+const LEGACY_PRICE_TO_PLAN = new Map([
+  ['price_1TKX8BA1siHjiLk36mgjovm4', 'light'],
+  ['price_1TKX9tA1siHjiLk3DpAMqVKG', 'standard'],
+  ['price_1TKXA7A1siHjiLk30rK61AHP', 'expert'],
+  ['price_1TIA1SAHjIANZ9z3a3U015UN', 'light'],
+  ['price_1TIA1jAHjIANZ9z3ReE5aAsV', 'standard'],
+  ['price_1TIA2LAHjIANZ9z3uNOI1ZQr', 'expert'],
 ])
 
 const getRedirectUrl = (env: Env, request: Request, key: 'STRIPE_SUCCESS_URL' | 'STRIPE_CANCEL_URL', fallback: string) =>
@@ -122,8 +131,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return jsonResponse({ error: 'Invalid request body.' }, 400, corsHeaders)
   }
 
-  const priceId = String(payload.price_id ?? payload.priceId ?? '')
-  const plan = PRICE_MAP.get(priceId)
+  const requestedPlanId = String(payload.plan_id ?? payload.planId ?? '')
+  const legacyPriceId = String(payload.price_id ?? payload.priceId ?? '')
+  const planId = requestedPlanId || LEGACY_PRICE_TO_PLAN.get(legacyPriceId) || ''
+  const plan = PLAN_MAP.get(planId)
   if (!plan) {
     return jsonResponse({ error: '不正なプランです。' }, 400, corsHeaders)
   }
@@ -136,7 +147,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   params.set('mode', 'payment')
   params.set('success_url', successUrl)
   params.set('cancel_url', cancelUrl)
-  params.set('line_items[0][price]', priceId)
+  params.set('line_items[0][price]', plan.priceId)
   params.set('line_items[0][quantity]', '1')
   params.set('client_reference_id', auth.user.id)
   if (email) {
@@ -144,9 +155,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
   params.set('metadata[user_id]', auth.user.id)
   params.set('metadata[email]', email)
+  params.set('metadata[plan_id]', planId)
   params.set('metadata[tickets]', String(plan.tickets))
-  params.set('metadata[price_id]', priceId)
-  params.set('metadata[plan_label]', plan.label)
+  params.set('metadata[amount_jpy]', String(plan.amountJpy))
+  params.set('metadata[price_id]', plan.priceId)
   params.set('metadata[app]', 'melteichi')
   params.set('payment_intent_data[statement_descriptor]', 'MELTEICHI')
 

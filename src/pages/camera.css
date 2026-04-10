@@ -126,7 +126,7 @@ body {
 }
 
 .top-nav {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -177,6 +177,88 @@ body {
   letter-spacing: 0.06em;
   color: #f3f4f6;
   text-decoration: none;
+}
+
+.top-nav__account {
+  position: relative;
+  margin-left: auto;
+}
+
+.top-nav__account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 116px;
+  border: 1px solid rgba(133, 157, 255, 0.36);
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(10, 18, 37, 0.86);
+  color: #eef4ff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 22px rgba(2, 6, 14, 0.28);
+}
+
+.top-nav__account-button:hover,
+.top-nav__account-button.is-open {
+  transform: translateY(-1px);
+  border-color: rgba(140, 177, 255, 0.7);
+  background: rgba(16, 28, 54, 0.95);
+  box-shadow: 0 14px 28px rgba(2, 6, 14, 0.34);
+}
+
+.top-nav__account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(117, 147, 240, 0.3);
+  background: rgba(7, 13, 26, 0.96);
+  box-shadow: 0 20px 36px rgba(2, 6, 14, 0.42);
+  backdrop-filter: blur(12px);
+}
+
+.top-nav__account-email {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(117, 147, 240, 0.2);
+  color: #b7caf9;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  word-break: break-all;
+}
+
+.top-nav__account-link,
+.top-nav__account-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: rgba(12, 21, 41, 0.9);
+  color: #eff5ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  text-align: center;
+}
+
+.top-nav__account-link:hover,
+.top-nav__account-logout:hover {
+  transform: translateY(-1px);
+  background: rgba(22, 36, 68, 0.96);
+  color: #ffffff;
 }
 
 .top-nav__links {
@@ -1627,7 +1709,7 @@ body {
 
 
   .top-nav {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -1877,6 +1959,180 @@ body {
     padding: 8px 6px;
   }
 }
+
+:root {
+  --camera-ink: #fff0f7;
+  --camera-muted: #d5a5bd;
+  --camera-accent: #ff4f9a;
+  --camera-accent-strong: #d92d7a;
+  --camera-soft: #240f1d;
+  --camera-card: #1d0c17;
+  --camera-shadow: rgba(19, 4, 12, 0.56);
+  --camera-outline: rgba(255, 116, 179, 0.24);
+  --camera-panel: #220d1b;
+  --camera-panel-strong: #170913;
+}
+
+.primary-button {
+  box-shadow: 0 12px 24px rgba(255, 79, 154, 0.32);
+}
+
+.primary-button:hover:not(:disabled) {
+  box-shadow: 0 16px 28px rgba(255, 79, 154, 0.4);
+}
+
+.ghost-button {
+  border-color: rgba(255, 116, 179, 0.38);
+}
+
+.ghost-button:hover:not(:disabled) {
+  border-color: rgba(255, 169, 208, 0.68);
+  color: #fff2f8;
+}
+
+.camera-app {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 79, 154, 0.24), transparent 46%),
+    radial-gradient(circle at 84% 14%, rgba(217, 45, 122, 0.2), transparent 42%),
+    linear-gradient(180deg, #120713 0%, #1a0915 100%);
+}
+
+.top-nav {
+  background: rgba(28, 8, 20, 0.92);
+  border-bottom: 1px solid rgba(255, 116, 179, 0.2);
+  box-shadow: 0 10px 24px rgba(19, 4, 12, 0.58);
+}
+
+.top-nav__logo {
+  box-shadow: 0 6px 14px rgba(19, 4, 12, 0.45);
+}
+
+.top-nav__title {
+  color: #fff2f8;
+}
+
+.top-nav__guest-copy {
+  color: #fff0f8;
+  text-shadow: 0 1px 10px rgba(255, 79, 154, 0.3);
+}
+
+.top-nav__link:hover {
+  background: rgba(255, 79, 154, 0.16);
+}
+
+.top-nav__link.is-active {
+  box-shadow: 0 10px 20px rgba(255, 79, 154, 0.32);
+}
+
+.top-nav__auth-button {
+  border: 1px solid rgba(255, 193, 225, 0.68);
+  background: #ff4f9a;
+  box-shadow: 0 14px 26px rgba(217, 45, 122, 0.48);
+}
+
+.top-nav__auth-button:hover:not(:disabled) {
+  background: #ec3f8b;
+  box-shadow: 0 18px 32px rgba(217, 45, 122, 0.56);
+}
+
+:root {
+  --camera-ink: #ecf9ff;
+  --camera-muted: #9fc5d9;
+  --camera-accent: #49ccff;
+  --camera-accent-strong: #1670cb;
+  --camera-soft: #0d233b;
+  --camera-card: #0b1c31;
+  --camera-shadow: rgba(2, 14, 30, 0.56);
+  --camera-outline: rgba(99, 208, 255, 0.24);
+  --camera-panel: #0b1a2d;
+  --camera-panel-strong: #071220;
+}
+
+.camera-app {
+  background:
+    radial-gradient(circle at 16% 18%, rgba(71, 201, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 84% 16%, rgba(30, 112, 229, 0.16), transparent 38%),
+    linear-gradient(180deg, #071d34 0%, #04111f 100%);
+}
+
+.camera-app::before {
+  background-image:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.14) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 18%, rgba(179, 240, 255, 0.14) 0 3px, transparent 4px),
+    radial-gradient(circle at 30% 72%, rgba(179, 240, 255, 0.12) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 74%, rgba(255, 255, 255, 0.1) 0 2px, transparent 3px);
+  background-size: 320px 320px, 420px 420px, 280px 280px, 360px 360px;
+  opacity: 0.32;
+}
+
+.primary-button {
+  box-shadow: 0 12px 24px rgba(18, 104, 203, 0.34);
+}
+
+.primary-button:hover:not(:disabled) {
+  box-shadow: 0 18px 28px rgba(18, 104, 203, 0.42);
+}
+
+.ghost-button {
+  border-color: rgba(99, 208, 255, 0.34);
+}
+
+.ghost-button:hover:not(:disabled) {
+  border-color: rgba(175, 241, 255, 0.62);
+  color: #effbff;
+}
+
+.top-nav {
+  background: rgba(5, 18, 33, 0.88);
+  border-bottom: 1px solid rgba(99, 208, 255, 0.2);
+  box-shadow: 0 10px 24px rgba(2, 12, 27, 0.56);
+}
+
+.top-nav__title {
+  color: #ecfaff;
+}
+
+.top-nav__link {
+  color: #a1c9dd;
+}
+
+.top-nav__guest-copy {
+  color: #d8f5ff;
+  text-shadow: 0 1px 10px rgba(71, 201, 255, 0.28);
+}
+
+.top-nav__link:hover {
+  background: rgba(71, 201, 255, 0.12);
+}
+
+.top-nav__link.is-active {
+  box-shadow: 0 10px 20px rgba(18, 104, 203, 0.28);
+}
+
+.top-nav__auth-button {
+  border: 1px solid rgba(175, 241, 255, 0.56);
+  background: linear-gradient(135deg, #5bdbff, #1c7ee2);
+  box-shadow: 0 14px 26px rgba(18, 104, 203, 0.42);
+}
+
+.top-nav__auth-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #74e3ff, #2a8deb);
+  box-shadow: 0 18px 32px rgba(18, 104, 203, 0.5);
+}
+
+@media (min-width: 981px) {
+  .top-nav {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .top-nav__link,
+  .top-nav__account-button,
+  .top-nav__auth-button {
+    min-height: 42px;
+  }
+}
+
 
 
 

@@ -16,7 +16,7 @@ const PIPELINE_USAGE_ID_MAX_LENGTH = 128
 const PIPELINE_USAGE_ID_MAX_AGE_MS = 15 * 60 * 1000
 const PIPELINE_USAGE_ID_PATTERN = /^media:(\d{13}):([A-Za-z0-9-]{16,96})$/
 const DEFAULT_IRODORI_ENDPOINT = 'https://api.runpod.ai/v2/qzj27jy7fkzpk7'
-const SIGNUP_TICKET_GRANT = 3
+const SIGNUP_TICKET_GRANT = 5
 const TTS_TICKET_COST = 1
 const HIDDEN_MODEL_NAME_PATTERN =
   /Irodori-TTS-500M-v2-VoiceDesign|Irodori-TTS-500M-v2|Irodori-TTS|Irodori|VoiceDesign|MMAudio|Wav2Lip|WAV2LIP/gi

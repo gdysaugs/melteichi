@@ -124,6 +124,12 @@
   gap: 14px;
 }
 
+.token-layout--single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: none;
+  margin: 0;
+}
+
 .token-card {
   border-radius: 18px;
   padding: 18px;
@@ -586,6 +592,21 @@
 }
 
 @media (max-width: 760px) {
+  .purchase-page.camera-app {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .token-lab {
+    width: 100%;
+  }
+
+  .token-layout--single {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
   .purchase-page .top-nav {
     background: rgba(12, 20, 46, 0.96);
   }
@@ -632,6 +653,11 @@
 }
 
 @media (max-width: 520px) {
+  .purchase-page.camera-app {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
   .token-button {
     width: 100%;
   }
@@ -639,4 +665,468 @@
   .token-auth-row {
     align-items: stretch;
   }
+}
+
+.purchase-page {
+  --shop-bg-0: #12060f;
+  --shop-bg-1: #1b0915;
+  --shop-bg-2: #341127;
+  --shop-surface: rgba(30, 11, 22, 0.76);
+  --shop-surface-strong: rgba(22, 8, 17, 0.9);
+  --shop-border: rgba(255, 116, 179, 0.28);
+  --shop-ink: #fff0f7;
+  --shop-muted: #d8a9bf;
+  --shop-accent: #ff5aa4;
+  --shop-accent-strong: #d92d7a;
+  --shop-shadow: 0 20px 42px rgba(18, 3, 11, 0.5);
+  --shop-shadow-soft: 0 12px 26px rgba(18, 3, 11, 0.34);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255, 90, 164, 0.24), transparent 34%),
+    radial-gradient(circle at 88% 6%, rgba(255, 157, 214, 0.14), transparent 30%),
+    radial-gradient(circle at 22% 78%, rgba(217, 45, 122, 0.18), transparent 42%),
+    linear-gradient(170deg, var(--shop-bg-2) 0%, var(--shop-bg-1) 45%, var(--shop-bg-0) 100%);
+}
+
+.purchase-page::before {
+  background: rgba(255, 90, 164, 0.22);
+}
+
+.purchase-page::after {
+  background: rgba(255, 157, 214, 0.16);
+}
+
+.purchase-page .top-nav {
+  background: rgba(24, 8, 17, 0.88);
+  border-bottom: 1px solid rgba(255, 116, 179, 0.24);
+  box-shadow: 0 14px 28px rgba(18, 3, 11, 0.46);
+}
+
+.purchase-page .top-nav__title {
+  color: #fff2f8;
+}
+
+.purchase-page .top-nav__link {
+  color: #deb0c6;
+}
+
+.purchase-page .top-nav__link:hover {
+  color: #fff6fa;
+  background: rgba(255, 79, 154, 0.18);
+}
+
+.purchase-page .top-nav__link.is-active {
+  background: linear-gradient(140deg, var(--shop-accent), var(--shop-accent-strong));
+  box-shadow: 0 10px 22px rgba(166, 24, 92, 0.36);
+}
+
+.token-simple-head,
+.token-card,
+.token-account-bottom,
+.token-plan,
+.token-bonus-card,
+.token-inline-message,
+.token-tips,
+.token-tips__bubble,
+.token-guide-comment__bubble {
+  border-color: rgba(255, 116, 179, 0.28);
+  background: rgba(24, 8, 17, 0.88);
+  box-shadow: var(--shop-shadow);
+}
+
+.token-simple-head {
+  background:
+    linear-gradient(145deg, rgba(255, 90, 164, 0.12), rgba(255, 90, 164, 0) 45%),
+    linear-gradient(165deg, rgba(255, 157, 214, 0.08), rgba(255, 157, 214, 0) 62%),
+    var(--shop-surface-strong);
+}
+
+.token-card::before {
+  background: linear-gradient(90deg, rgba(255, 157, 214, 0.88), rgba(255, 90, 164, 0.88));
+}
+
+.token-card--store,
+.token-plan.is-featured,
+.token-bonus-card,
+.token-guide-comment--daily .token-guide-comment__bubble,
+.token-account-bottom {
+  background:
+    linear-gradient(160deg, rgba(255, 90, 164, 0.1), rgba(255, 90, 164, 0) 52%),
+    rgba(24, 8, 17, 0.88);
+}
+
+.token-simple-head h1,
+.token-card__head h2,
+.token-plan__name,
+.token-plan__price,
+.token-tips__title,
+.token-tips__bubble h4 {
+  color: #fff2f8;
+}
+
+.token-simple-head p,
+.token-auth-lead,
+.token-account-bottom__line,
+.token-bonus-state,
+.token-guide-comment__bubble,
+.token-tips__item,
+.token-tips__bubble ul,
+.token-plan__tokens,
+.token-plan__unit {
+  color: #dfb1c7;
+}
+
+.token-card__kicker,
+.token-plan__badge,
+.token-account-bottom__line span {
+  color: #ffb7d8;
+}
+
+.token-pill {
+  border-color: rgba(255, 116, 179, 0.4);
+  background: rgba(255, 79, 154, 0.16);
+  color: #ffe4f1;
+}
+
+.token-pill--online {
+  background: rgba(255, 145, 201, 0.16);
+  border-color: rgba(255, 145, 201, 0.46);
+  color: #ffd8ea;
+}
+
+.token-button--ghost {
+  border-color: rgba(255, 116, 179, 0.4);
+  background: rgba(255, 79, 154, 0.12);
+}
+
+.token-tips__bubble code {
+  background: rgba(255, 79, 154, 0.18);
+  border: 1px solid rgba(255, 116, 179, 0.4);
+}
+
+.token-inline-message,
+.token-inline-message--error,
+.token-account-bottom__error,
+.token-bonus-result,
+.token-account-bottom__line strong {
+  color: #ffe1ee;
+}
+
+.purchase-page {
+  --shop-bg-0: #04111f;
+  --shop-bg-1: #07213a;
+  --shop-bg-2: #0d3d67;
+  --shop-surface: rgba(9, 26, 46, 0.78);
+  --shop-surface-strong: rgba(6, 18, 33, 0.9);
+  --shop-border: rgba(99, 208, 255, 0.24);
+  --shop-ink: #ebf9ff;
+  --shop-muted: #9fc5d9;
+  --shop-accent: #4bceff;
+  --shop-accent-strong: #176fcb;
+  --shop-shadow: 0 20px 42px rgba(1, 10, 24, 0.5);
+  --shop-shadow-soft: 0 12px 26px rgba(1, 10, 24, 0.34);
+  position: relative;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(76, 208, 255, 0.2), transparent 34%),
+    radial-gradient(circle at 88% 6%, rgba(132, 235, 255, 0.12), transparent 30%),
+    radial-gradient(circle at 22% 78%, rgba(23, 111, 203, 0.16), transparent 42%),
+    linear-gradient(170deg, var(--shop-bg-2) 0%, var(--shop-bg-1) 45%, var(--shop-bg-0) 100%);
+}
+
+.purchase-page::before {
+  background: rgba(98, 219, 255, 0.2);
+}
+
+.purchase-page::after {
+  background: rgba(24, 112, 204, 0.16);
+}
+
+.purchase-page .top-nav {
+  background: rgba(4, 18, 33, 0.88);
+  border-bottom: 1px solid rgba(99, 208, 255, 0.22);
+  box-shadow: 0 14px 28px rgba(1, 10, 24, 0.46);
+}
+
+.purchase-page .top-nav__title {
+  color: #effbff;
+}
+
+.purchase-page .top-nav__link {
+  color: #a1c9dd;
+}
+
+.purchase-page .top-nav__link:hover {
+  color: #f5fdff;
+  background: rgba(71, 201, 255, 0.14);
+}
+
+.purchase-page .top-nav__link.is-active {
+  background: linear-gradient(140deg, var(--shop-accent), var(--shop-accent-strong));
+  box-shadow: 0 10px 22px rgba(18, 104, 203, 0.32);
+}
+
+.token-simple-head,
+.token-card,
+.token-account-bottom,
+.token-plan,
+.token-bonus-card,
+.token-inline-message,
+.token-tips,
+.token-tips__bubble,
+.token-guide-comment__bubble {
+  border-color: rgba(99, 208, 255, 0.24);
+  background:
+    linear-gradient(160deg, rgba(86, 217, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(6, 19, 34, 0.9);
+  box-shadow: var(--shop-shadow);
+}
+
+.token-simple-head {
+  background:
+    linear-gradient(145deg, rgba(92, 219, 255, 0.12), rgba(92, 219, 255, 0) 45%),
+    linear-gradient(165deg, rgba(165, 240, 255, 0.08), rgba(165, 240, 255, 0) 62%),
+    var(--shop-surface-strong);
+}
+
+.token-card::before {
+  background: linear-gradient(90deg, rgba(165, 240, 255, 0.9), rgba(75, 206, 255, 0.88));
+}
+
+.token-card--store,
+.token-plan.is-featured,
+.token-bonus-card,
+.token-guide-comment--daily .token-guide-comment__bubble,
+.token-account-bottom {
+  background:
+    linear-gradient(160deg, rgba(75, 206, 255, 0.1), rgba(75, 206, 255, 0) 52%),
+    rgba(6, 19, 34, 0.9);
+}
+
+.token-simple-head h1,
+.token-card__head h2,
+.token-plan__name,
+.token-plan__price,
+.token-tips__title,
+.token-tips__bubble h4 {
+  color: #effbff;
+}
+
+.token-simple-head p,
+.token-auth-lead,
+.token-account-bottom__line,
+.token-bonus-state,
+.token-guide-comment__bubble,
+.token-tips__item,
+.token-tips__bubble ul,
+.token-plan__tokens,
+.token-plan__unit {
+  color: #a9cfdf;
+}
+
+.token-card__kicker,
+.token-plan__badge,
+.token-account-bottom__line span {
+  color: #94e6ff;
+}
+
+.token-pill {
+  border-color: rgba(99, 208, 255, 0.34);
+  background: rgba(71, 201, 255, 0.1);
+  color: #dff7ff;
+}
+
+.token-pill--online {
+  background: rgba(124, 228, 255, 0.12);
+  border-color: rgba(124, 228, 255, 0.4);
+  color: #dff9ff;
+}
+
+.token-button--ghost {
+  border-color: rgba(99, 208, 255, 0.34);
+  background: rgba(71, 201, 255, 0.08);
+}
+
+.token-tips__bubble code {
+  background: rgba(71, 201, 255, 0.14);
+  border: 1px solid rgba(99, 208, 255, 0.34);
+}
+
+.token-inline-message,
+.token-inline-message--error,
+.token-account-bottom__error,
+.token-bonus-result,
+.token-account-bottom__line strong {
+  color: #def7ff;
+}
+
+.purchase-page {
+  --shop-bg-0: #040d18;
+  --shop-bg-1: #0a2037;
+  --shop-bg-2: #103d66;
+  --shop-surface: rgba(8, 22, 38, 0.78);
+  --shop-surface-strong: rgba(7, 18, 31, 0.9);
+  --shop-border: rgba(123, 219, 255, 0.24);
+  --shop-ink: #ecf9ff;
+  --shop-muted: #9cbfd0;
+  --shop-accent: #67dfff;
+  --shop-accent-strong: #2f7fe0;
+  --shop-shadow: 0 24px 48px rgba(1, 10, 24, 0.52);
+  --shop-shadow-soft: 0 14px 28px rgba(1, 10, 24, 0.34);
+}
+
+.purchase-page::before {
+  background: rgba(94, 219, 255, 0.16);
+}
+
+.purchase-page::after {
+  background: rgba(47, 127, 224, 0.14);
+}
+
+.purchase-page .top-nav {
+  background: rgba(5, 18, 33, 0.88);
+  border-bottom: 1px solid rgba(99, 208, 255, 0.2);
+  box-shadow: 0 10px 24px rgba(2, 12, 27, 0.56);
+}
+
+.purchase-page .top-nav__title {
+  color: #ecfaff;
+}
+
+.purchase-page .top-nav__link {
+  color: #a1c9dd;
+}
+
+.purchase-page .top-nav__link:hover {
+  background: rgba(71, 201, 255, 0.12);
+}
+
+.purchase-page .top-nav__link.is-active {
+  box-shadow: 0 10px 20px rgba(18, 104, 203, 0.28);
+}
+
+.purchase-page .top-nav__account-button {
+  border-color: rgba(133, 157, 255, 0.36);
+  background: rgba(10, 18, 37, 0.86);
+  color: #eef4ff;
+  box-shadow: 0 10px 22px rgba(2, 6, 14, 0.28);
+}
+
+.purchase-page .top-nav__account-button:hover,
+.purchase-page .top-nav__account-button.is-open {
+  border-color: rgba(140, 177, 255, 0.7);
+  background: rgba(16, 28, 54, 0.95);
+  box-shadow: 0 14px 28px rgba(2, 6, 14, 0.34);
+}
+
+.purchase-page .top-nav__account-menu {
+  border-color: rgba(117, 147, 240, 0.3);
+  background: rgba(7, 13, 26, 0.96);
+  box-shadow: 0 20px 36px rgba(2, 6, 14, 0.42);
+}
+
+.purchase-page .top-nav__account-email {
+  border-bottom-color: rgba(117, 147, 240, 0.2);
+  color: #b7caf9;
+}
+
+.purchase-page .top-nav__account-link,
+.purchase-page .top-nav__account-logout {
+  background: rgba(12, 21, 41, 0.9);
+  color: #eff5ff;
+}
+
+.purchase-page .top-nav__account-link:hover,
+.purchase-page .top-nav__account-logout:hover {
+  background: rgba(22, 36, 68, 0.96);
+  color: #ffffff;
+}
+
+.token-card,
+.token-bonus-card,
+.token-plan,
+.token-account-bottom,
+.token-inline-message {
+  border-color: rgba(123, 219, 255, 0.22);
+  background:
+    linear-gradient(160deg, rgba(92, 219, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    rgba(7, 18, 31, 0.92);
+  box-shadow: var(--shop-shadow);
+}
+
+.token-card::before {
+  background: linear-gradient(90deg, rgba(152, 233, 255, 0.88), rgba(80, 192, 255, 0.88));
+}
+
+.token-card--store,
+.token-bonus-card,
+.token-account-bottom,
+.token-plan.is-featured {
+  background:
+    linear-gradient(160deg, rgba(79, 205, 255, 0.1), rgba(79, 205, 255, 0) 52%),
+    rgba(7, 18, 31, 0.92);
+}
+
+.token-card__kicker,
+.token-account-bottom__line span,
+.token-plan__badge {
+  color: #92e8ff;
+}
+
+.token-card__head h2,
+.token-bonus-card__head h3,
+.token-plan__price,
+.token-plan__tokens,
+.token-account-bottom__line strong {
+  color: #eefbff;
+}
+
+.token-auth-lead,
+.token-bonus-state,
+.token-bonus-result,
+.token-plan__unit,
+.token-pill,
+.token-inline-message,
+.token-account-bottom__line {
+  color: #9cbfd0;
+}
+
+.token-pill {
+  border-color: rgba(123, 219, 255, 0.3);
+  background: rgba(79, 205, 255, 0.08);
+}
+
+.token-pill--online {
+  background: rgba(109, 225, 255, 0.1);
+  border-color: rgba(109, 225, 255, 0.34);
+  color: #dff8ff;
+}
+
+.token-button--primary,
+.token-button--buy {
+  background: linear-gradient(135deg, #68ddff, #337fe0);
+  box-shadow: 0 12px 24px rgba(21, 97, 178, 0.34);
+}
+
+.token-button--ghost {
+  border-color: rgba(123, 219, 255, 0.3);
+  background: rgba(79, 205, 255, 0.08);
+  color: #eaf9ff;
+}
+
+.token-plan-grid {
+  gap: 12px;
+}
+
+.token-plan {
+  padding: 14px;
+  gap: 10px;
+}
+
+.token-plan__tokens {
+  font-size: 1.68rem;
+}
+
+.token-inline-message--error {
+  border-color: rgba(255, 134, 134, 0.34);
+  background: rgba(58, 14, 19, 0.62);
+  color: #ffd6d6;
 }
