@@ -8,6 +8,7 @@ import { Purchase } from './pages/Purchase'
 import { Terms } from './pages/Terms'
 import { Tokushoho } from './pages/Tokushoho'
 import { Video } from './pages/Video'
+import { FluxTurboTest } from './pages/FluxTurboTest'
 
 function HomeRouteGate() {
   const [session, setSession] = useState<Session | null>(null)
@@ -116,6 +117,7 @@ export function App() {
       <Route path='/mmaudio' element={<Navigate to='/video' replace />} />
       <Route path='/sfx' element={<Navigate to='/video' replace />} />
       <Route path='/image' element={<Navigate to='/video' replace />} />
+      <Route path='/flux-turbo-test' element={<FluxTurboTest />} />
       <Route path='/purchase' element={<PurchaseRouteGate />} />
       <Route path='/account' element={<Account />} />
       <Route path='/terms' element={<Terms />} />

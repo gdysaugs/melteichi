@@ -533,6 +533,29 @@
   padding-right: 8px;
 }
 
+.studio-chip {
+  border: 1px solid rgba(126, 169, 255, 0.35);
+  border-radius: 8px;
+  background: rgba(18, 26, 43, 0.82);
+  color: #f3f6ff;
+  min-width: 72px;
+  min-height: 36px;
+  padding: 7px 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.studio-chip--active {
+  background: linear-gradient(135deg, #5b7cfa, #38bdf8);
+  border-color: rgba(191, 219, 254, 0.9);
+  color: #fff;
+}
+
 .studio-duration-row {
   border: 1px solid rgba(127, 142, 212, 0.2);
   border-radius: 10px;
