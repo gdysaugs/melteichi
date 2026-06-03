@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import { saveGeneratedAsset } from '../lib/downloadMedia'
 import { isAuthConfigured, supabase } from '../lib/supabaseClient'
@@ -25,7 +26,7 @@ type SubmitResult =
   | { images: string[]; jobId?: never; usageId?: string }
   | { images?: never; jobId: string; usageId?: string }
 
-const ENDPOINT = '/api/flux-turbo-i2i'
+const ENDPOINT = '/api/i2i'
 const OAUTH_REDIRECT_URL =
   import.meta.env.VITE_SUPABASE_REDIRECT_URL ?? (typeof window !== 'undefined' ? window.location.origin : undefined)
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024
@@ -336,7 +337,7 @@ export function FluxTurboTest() {
       strength_model: ANATOMY_LORA_STRENGTH,
       strength_clip: 0,
       randomize_seed: true,
-      filename_prefix: 'melteichi-flux-turbo-test',
+      filename_prefix: 'melteichi-i2i',
     }
     if (reference) {
       input.reference_image_base64 = reference.payload
@@ -394,7 +395,7 @@ export function FluxTurboTest() {
     runIdRef.current = runId
     setIsRunning(true)
     setResultImage(null)
-    setStatusMessage('turboモデルで画像編集をテスト中です。')
+    setStatusMessage('I2Iで画像編集を実行中です。')
 
     try {
       const submitted = await submitGenerate()
@@ -423,7 +424,7 @@ export function FluxTurboTest() {
     if (!resultImage || isSaving) return
     setIsSaving(true)
     try {
-      await saveGeneratedAsset({ source: resultImage, filenamePrefix: 'melteichi-flux-turbo-test', fallbackExtension: 'png' })
+      await saveGeneratedAsset({ source: resultImage, filenamePrefix: 'melteichi-i2i', fallbackExtension: 'png' })
     } finally {
       setIsSaving(false)
     }
@@ -444,23 +445,37 @@ export function FluxTurboTest() {
       <main className="studio-wrap studio-wrap--workspace inpaint-wrap">
         <section className="studio-panel studio-panel--controls">
           <header className="studio-heading">
-            <h1>画像編集テスト</h1>
-            <p>turboモデル差し替え確認用の隠しページです。既存の画像編集ページと同じAPI形式で送信します。</p>
+            <h1>I2I</h1>
+            <p>MeltAI公式のI2Iを強化した画像編集です。よりリアル感や多様な表現を可能にしました。Step8は4よりも安定感が上がりますが、通常は4Stepで十分です。</p>
           </header>
 
-          <div className="studio-account-strip">
-            <p className="studio-token-line">
-              残り:
-              <strong className="studio-token-value">{session ? ticketCount ?? '--' : '--'}</strong>
-            </p>
-            <div className="studio-ticket-row">
-              <span className="studio-ticket-label">消費</span>
-              <strong className="studio-ticket-value">{ticketCost}</strong>
-              <span className="studio-ticket-cost">1回生成</span>
-            </div>
+          {session && (
+            <section className="studio-account-panel">
+              <div className="studio-account-summary">
+                <div className="studio-account-meta">
+                  <span className="studio-account-label">ログイン中</span>
+                  <strong className="studio-account-email">{session.user.email ?? 'Google Account'}</strong>
+                </div>
+                <div className="studio-account-meta studio-account-meta--gems">
+                  <span className="studio-account-label">保有Gem</span>
+                  <strong className="studio-account-gem">{ticketCount === null ? '確認中...' : `${ticketCount} Gem`}</strong>
+                </div>
+              </div>
+              <div className="studio-account-actions">
+                <Link className="studio-btn studio-btn--ghost" to="/purchase">
+                  Gem購入
+                </Link>
+              </div>
+            </section>
+          )}
+
+          <div className="studio-ticket-row">
+            <span className="studio-ticket-label">必要Gem</span>
+            <strong className="studio-ticket-value">{ticketCost}</strong>
+            <span className="studio-ticket-cost">1回生成</span>
           </div>
 
-          <div className="studio-form-stack">
+          <div className="studio-stack">
             <section className="studio-section">
               <h2 className="studio-section-title">Images</h2>
               <label className="studio-upload">
@@ -555,7 +570,7 @@ export function FluxTurboTest() {
           <div className="studio-generate-dock">
             {session ? (
               <button type="button" className="studio-btn studio-btn--primary" onClick={handleGenerate} disabled={!canGenerate}>
-                {isRunning ? '生成中...' : `${ticketCost}枚消費して生成`}
+                {isRunning ? '生成中...' : `${ticketCost} Gem消費して生成`}
               </button>
             ) : (
               <button type="button" className="studio-btn studio-btn--primary" onClick={handleGoogleSignIn}>
@@ -583,15 +598,21 @@ export function FluxTurboTest() {
 
           <div className="studio-preview-head inpaint-result-head">
             <h2>生成結果</h2>
-            <span>{resultImage ? '完了' : '待機中'}</span>
+            <span>{isRunning ? '生成中' : resultImage ? '完了' : '待機中'}</span>
           </div>
           <div className="studio-canvas inpaint-result-canvas" style={viewerStyle}>
             {isRunning ? (
-              <div className="studio-loading studio-loading--video">
-                <span className="studio-light-ring" aria-hidden="true">
-                  <span className="studio-light-ring__beam" />
-                  <span className="studio-light-ring__core" />
-                </span>
+              <div className="studio-loading studio-loading--video" role="status" aria-live="polite">
+                <div className="studio-loading-orb" aria-hidden="true">
+                  <span className="studio-loading-orb__ring studio-loading-orb__ring--outer" />
+                  <span className="studio-loading-orb__ring studio-loading-orb__ring--mid" />
+                  <span className="studio-loading-orb__ring studio-loading-orb__ring--inner" />
+                  <span className="studio-loading-orb__glow" />
+                  <span className="studio-loading-orb__core" />
+                  <span className="studio-loading-orb__spark studio-loading-orb__spark--a" />
+                  <span className="studio-loading-orb__spark studio-loading-orb__spark--b" />
+                  <span className="studio-loading-orb__spark studio-loading-orb__spark--c" />
+                </div>
                 <p className="studio-loading__title">生成中です</p>
                 <p className="studio-loading__subtitle">画像編集を実行しています。</p>
               </div>

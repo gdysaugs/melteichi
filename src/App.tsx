@@ -111,13 +111,14 @@ export function App() {
       <Route path='/smoothmix' element={<Navigate to='/video' replace />} />
       <Route path='/video-lora' element={<Navigate to='/video' replace />} />
       <Route path='/t2v' element={<Navigate to='/video' replace />} />
-      <Route path='/tts' element={<Navigate to='/video' replace />} />
-      <Route path='/lipsync' element={<Navigate to='/video' replace />} />
-      <Route path='/voice' element={<Navigate to='/video' replace />} />
-      <Route path='/mmaudio' element={<Navigate to='/video' replace />} />
+      <Route path='/tts' element={<Navigate to='/' replace />} />
+      <Route path='/lipsync' element={<Navigate to='/' replace />} />
+      <Route path='/voice' element={<Navigate to='/' replace />} />
+      <Route path='/mmaudio' element={<Navigate to='/' replace />} />
       <Route path='/sfx' element={<Navigate to='/video' replace />} />
       <Route path='/image' element={<Navigate to='/video' replace />} />
-      <Route path='/flux-turbo-test' element={<FluxTurboTest />} />
+      <Route path='/i2i' element={<FluxTurboTest />} />
+      <Route path='/flux-turbo-test' element={<Navigate to='/i2i' replace />} />
       <Route path='/purchase' element={<PurchaseRouteGate />} />
       <Route path='/account' element={<Account />} />
       <Route path='/terms' element={<Terms />} />

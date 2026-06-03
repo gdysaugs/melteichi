@@ -1152,14 +1152,6 @@ export function Video() {
           {statusMessage && <p className="studio-status studio-status--preview">{statusMessage}</p>}
         </section>
 
-        <nav className="studio-legal-links" aria-label="リーガルリンク">
-          <Link className="studio-legal-links__item" to="/terms">
-            利用規約
-          </Link>
-          <Link className="studio-legal-links__item" to="/tokushoho">
-            特商法
-          </Link>
-        </nav>
       </main>
 
       {showTicketModal && (

@@ -119,6 +119,9 @@ export function TopNav() {
               <NavLink className='top-nav__account-link' to='/purchase' onClick={() => setIsAccountOpen(false)}>
                 Purchase
               </NavLink>
+              <NavLink className='top-nav__account-link' to='/i2i' onClick={() => setIsAccountOpen(false)}>
+                I2I
+              </NavLink>
               <button type='button' className='top-nav__account-logout' onClick={handleSignOut}>
                 Logout
               </button>

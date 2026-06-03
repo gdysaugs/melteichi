@@ -21,19 +21,19 @@ export function Tokushoho() {
             </div>
             <div className="legal-row">
               <div className="legal-key">運営責任者</div>
-              <div className="legal-value">Sato Natsu</div>
+              <div className="legal-value">必要があれば開示します</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">所在地</div>
-              <div className="legal-value">愛知県名古屋市中区</div>
+              <div className="legal-value">必要があれば開示します</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">電話番号</div>
-              <div className="legal-value">0582105684301</div>
+              <div className="legal-value">必要があれば開示します</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">問い合わせ先</div>
-              <div className="legal-value">サイト内問い合わせフォームまたは上記電話番号</div>
+              <div className="legal-value">サイト内問い合わせフォーム</div>
             </div>
             <div className="legal-row">
               <div className="legal-key">販売価格</div>
@@ -78,9 +78,6 @@ export function Tokushoho() {
           </div>
 
           <div className="legal-links">
-            <Link className="legal-link" to="/terms">
-              利用規約
-            </Link>
             <Link className="legal-link" to="/">
               生成ページへ戻る
             </Link>

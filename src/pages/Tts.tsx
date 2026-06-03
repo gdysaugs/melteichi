@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import './camera.css'
 import './tts.css'
@@ -266,14 +265,6 @@ export function Tts() {
           )}
         </section>
 
-        <nav className='studio-legal-links' aria-label='リーガルリンク'>
-          <Link className='studio-legal-links__item' to='/terms'>
-            利用規約
-          </Link>
-          <Link className='studio-legal-links__item' to='/tokushoho'>
-            特商法
-          </Link>
-        </nav>
       </main>
     </div>
   )

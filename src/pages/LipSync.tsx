@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 import './camera.css'
 import './lipsync.css'
@@ -418,17 +417,8 @@ export function LipSync() {
           )}
         </section>
 
-        <nav className='studio-legal-links' aria-label={'\u30ea\u30fc\u30ac\u30eb\u30ea\u30f3\u30af'}>
-          <Link className='studio-legal-links__item' to='/terms'>
-            {'\u5229\u7528\u898f\u7d04'}
-          </Link>
-          <Link className='studio-legal-links__item' to='/tokushoho'>
-            {'\u7279\u5546\u6cd5'}
-          </Link>
-        </nav>
       </main>
     </div>
   )
 }
-
 
