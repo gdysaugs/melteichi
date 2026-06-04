@@ -28,6 +28,7 @@ const SIGNUP_TICKET_GRANT = 5
 const TICKET_COST = 1
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024
 const MAX_PROMPT_LENGTH = 1600
+const MAX_NEGATIVE_PROMPT_LENGTH = 1600
 const MIN_DIMENSION = 256
 const MAX_DIMENSION = 1536
 const MAX_REFERENCE_IMAGES = 1
@@ -634,8 +635,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const input = (payload.input ?? payload) as Record<string, unknown>
   const prompt = String(input.prompt ?? input.text ?? '').trim()
+  const negativePrompt = String(input.negative_prompt ?? input.negative ?? '').trim()
   if (!prompt) return jsonResponse({ error: 'プロンプトが必要です。' }, 400, corsHeaders)
   if (prompt.length > MAX_PROMPT_LENGTH) return jsonResponse({ error: 'プロンプトが長すぎます。' }, 400, corsHeaders)
+  if (negativePrompt.length > MAX_NEGATIVE_PROMPT_LENGTH) {
+    return jsonResponse({ error: 'ネガティブプロンプトが長すぎます。' }, 400, corsHeaders)
+  }
 
   let sourceImageBase64 = ''
   let referenceImages: Array<{ name: string; image: string }> = []
@@ -671,6 +676,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const usageId = `flux_i2i:pending:${makeUsageId()}`
   const ticketMeta = {
     prompt_length: prompt.length,
+    negative_prompt_length: negativePrompt.length,
     width,
     height,
     steps,
@@ -695,6 +701,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const runpodInput: Record<string, unknown> = {
     prompt,
+    negative_prompt: negativePrompt,
     image_base64: sourceImageBase64,
     image_name: String(input.image_name ?? 'source.png'),
     model: String(input.model ?? 'distilled'),

@@ -32,6 +32,8 @@ const OAUTH_REDIRECT_URL =
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024
 const MAX_WORK_IMAGE_SIDE = 1024
 const MIN_WORK_IMAGE_SIDE = 256
+const MAX_PROMPT_LENGTH = 1600
+const MAX_NEGATIVE_PROMPT_LENGTH = 1600
 const DEFAULT_STEPS = 4
 const DEFAULT_CFG = 1
 const FIXED_MEGAPIXELS = 1
@@ -179,6 +181,7 @@ export function FluxTurboTest() {
   const [source, setSource] = useState<PreparedImage | null>(null)
   const [reference, setReference] = useState<PreparedImage | null>(null)
   const [prompt, setPrompt] = useState('')
+  const [negativePrompt, setNegativePrompt] = useState('')
   const [generationSteps, setGenerationSteps] = useState<4 | 8>(DEFAULT_STEPS)
   const [cfgScale, setCfgScale] = useState(DEFAULT_CFG)
   const [resultImage, setResultImage] = useState<string | null>(null)
@@ -324,6 +327,7 @@ export function FluxTurboTest() {
 
     const input: Record<string, unknown> = {
       prompt: prompt.trim(),
+      negative_prompt: negativePrompt.trim(),
       image_base64: source.payload,
       image_name: source.name || 'source.png',
       width: source.width,
@@ -360,7 +364,7 @@ export function FluxTurboTest() {
     const jobId = extractJobId(data)
     if (!jobId) throw new Error('ジョブIDを取得できませんでした。')
     return { jobId, usageId: data?.usage_id }
-  }, [cfgScale, fetchWithAuth, generationSteps, prompt, reference, source])
+  }, [cfgScale, fetchWithAuth, generationSteps, negativePrompt, prompt, reference, source])
 
   const pollJob = useCallback(
     async (jobId: string, usageId: string | undefined, runId: number) => {
@@ -518,11 +522,21 @@ export function FluxTurboTest() {
                 <textarea
                   value={prompt}
                   onChange={(event) => setPrompt(event.target.value)}
-                  maxLength={1600}
+                  maxLength={MAX_PROMPT_LENGTH}
                   placeholder="編集内容を詳しく入力"
                 />
               </label>
-              <p className="studio-field-note">{prompt.length}/1600</p>
+              <p className="studio-field-note">{prompt.length}/{MAX_PROMPT_LENGTH}</p>
+              <label className="studio-field">
+                <span>ネガティブプロンプト（任意）</span>
+                <textarea
+                  value={negativePrompt}
+                  onChange={(event) => setNegativePrompt(event.target.value)}
+                  maxLength={MAX_NEGATIVE_PROMPT_LENGTH}
+                  placeholder="避けたい内容を入力"
+                />
+              </label>
+              <p className="studio-field-note">{negativePrompt.length}/{MAX_NEGATIVE_PROMPT_LENGTH}</p>
             </section>
 
             <section className="studio-section">
