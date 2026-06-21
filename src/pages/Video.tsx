@@ -292,8 +292,8 @@ const isDailyClaimAvailable = (canClaim: boolean, targetIso: string | null, rema
 const extractJobId = (payload: any) => payload?.id || payload?.jobId || payload?.job_id || payload?.output?.id
 
 const alignTo16 = (value: number) => Math.max(16, Math.round(value / 16) * 16)
-const PORTRAIT_MAX = { width: 576, height: 832 }
-const LANDSCAPE_MAX = { width: 832, height: 576 }
+const PORTRAIT_MAX = { width: 448, height: 640 }
+const LANDSCAPE_MAX = { width: 640, height: 448 }
 
 const fitWithinBounds = (width: number, height: number, maxWidth: number, maxHeight: number) => {
   const scale = Math.min(1, maxWidth / width, maxHeight / height)
@@ -346,8 +346,8 @@ export function Video() {
   const [negativePrompt, setNegativePrompt] = useState('')
   const [enhancementStrengthMode, setEnhancementStrengthMode] = useState<EnhancementStrengthMode>('low')
   const [videoLengthSeconds, setVideoLengthSeconds] = useState<VideoLengthSeconds>(DEFAULT_VIDEO_LENGTH_SECONDS as VideoLengthSeconds)
-  const [width, setWidth] = useState(832)
-  const [height, setHeight] = useState(576)
+  const [width, setWidth] = useState(640)
+  const [height, setHeight] = useState(448)
   const [displayVideo, setDisplayVideo] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState('')
   const [isRunning, setIsRunning] = useState(false)
