@@ -669,7 +669,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const height = clampInt(input.height, 1024, MIN_DIMENSION, MAX_DIMENSION)
   const steps = clampInt(input.steps, 4, 1, 40)
   const cfg = clampFloat(input.cfg, 1, 0, 20)
-  const megapixels = clampFloat(input.megapixels, 1, 0.05, 4)
+  const megapixels = clampFloat(input.megapixels, 0.5, 0.05, 4)
   const ticketCost = resolveTicketCost(env, steps)
   const loraName = String(input.lora_name ?? 'klein_slider_anatomy.safetensors').trim()
   const loraStrength = clampFloat(input.strength_model ?? input.lora_strength, 1, -4, 4)

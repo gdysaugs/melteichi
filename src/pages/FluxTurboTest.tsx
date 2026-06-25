@@ -36,7 +36,7 @@ const MAX_PROMPT_LENGTH = 1600
 const MAX_NEGATIVE_PROMPT_LENGTH = 1600
 const DEFAULT_STEPS = 4
 const DEFAULT_CFG = 1
-const FIXED_MEGAPIXELS = 1
+const FIXED_MEGAPIXELS = 0.5
 const ANATOMY_LORA_NAME = 'klein_slider_anatomy.safetensors'
 const ANATOMY_LORA_STRENGTH = 1
 
