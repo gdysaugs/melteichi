@@ -1123,8 +1123,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const loraPackStrengths = resolveLoraPackStrengths(loraStrengthMode)
   const steps = isAnimate ? FIXED_STEPS_ANIMATE : isLoraPack ? LORA_PACK_STEPS : FIXED_STEPS
   const cfg = 1
-  const width = Math.floor(Number(input?.width ?? 640))
-  const height = Math.floor(Number(input?.height ?? 448))
+  const width = Math.floor(Number(input?.width ?? 720))
+  const height = Math.floor(Number(input?.height ?? 512))
   const fps = isAnimate ? FIXED_FPS_DEFAULT : isLoraPack ? LORA_PACK_FPS : i2vVariant === 'dasiwa' ? FIXED_FPS_DASIWA : FIXED_FPS_DEFAULT
   const numFrames = isAnimate
     ? Math.max(1, Math.floor(Number(input?.num_frames ?? FIXED_ANIMATE_FRAMES)))

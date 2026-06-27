@@ -824,8 +824,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const negativePrompt = String(input?.negative_prompt ?? input?.negative ?? '')
   const steps = FIXED_STEPS
   const guidanceScale = Number(input?.guidance_scale ?? input?.cfg ?? 1)
-  const width = Math.floor(Number(input?.width ?? 768))
-  const height = Math.floor(Number(input?.height ?? 768))
+  const width = Math.floor(Number(input?.width ?? 1024))
+  const height = Math.floor(Number(input?.height ?? 1024))
   const angleStrengthInput = input?.angle_strength ?? input?.multiangle_strength ?? undefined
   const angleStrength =
     angleStrengthInput === undefined || angleStrengthInput === null ? 0 : Number(angleStrengthInput)
@@ -1176,4 +1176,3 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     )
   }
 }
-
