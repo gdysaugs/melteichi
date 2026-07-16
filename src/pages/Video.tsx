@@ -10,7 +10,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
 import { isAuthConfigured, supabase } from '../lib/supabaseClient'
-import { saveGeneratedAsset } from '../lib/downloadMedia'
+import {
+  prepareGeneratedAsset,
+  saveGeneratedAsset,
+  type PreparedGeneratedAsset,
+} from '../lib/downloadMedia'
 import { TopNav } from '../components/TopNav'
 import './camera.css'
 import './video-studio.css'
@@ -348,7 +352,7 @@ export function Video() {
   const [videoLengthSeconds, setVideoLengthSeconds] = useState<VideoLengthSeconds>(DEFAULT_VIDEO_LENGTH_SECONDS as VideoLengthSeconds)
   const [width, setWidth] = useState(LANDSCAPE_MAX.width)
   const [height, setHeight] = useState(LANDSCAPE_MAX.height)
-  const [displayVideo, setDisplayVideo] = useState<string | null>(null)
+  const [displayVideo, setDisplayVideo] = useState<PreparedGeneratedAsset | null>(null)
   const [statusMessage, setStatusMessage] = useState('')
   const [isRunning, setIsRunning] = useState(false)
   const [session, setSession] = useState<Session | null>(null)
@@ -367,6 +371,7 @@ export function Video() {
   const [errorModalMessage, setErrorModalMessage] = useState<string | null>(null)
   const [isSavingResult, setIsSavingResult] = useState(false)
   const runIdRef = useRef(0)
+  const displayVideoRef = useRef<PreparedGeneratedAsset | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
   const [videoModel, setVideoModel] = useState<VideoModel>(DEFAULT_VIDEO_MODEL)
@@ -378,7 +383,7 @@ export function Video() {
   const requiredPoints = selectedVideoLength.ticketCost
   const requiredPointsForRun = requiredPoints
   const canGenerate = Boolean(sourcePayload && prompt.trim() && !isRunning && session)
-  const isGif = displayVideo?.startsWith('data:image/gif')
+  const isGif = displayVideo?.extension === 'gif'
   const loadingSubtitle = '動画生成を実行中です。'
   const effectiveDailyCanClaim = isDailyClaimAvailable(dailyCanClaim, dailyNextEligibleAt, dailyRemainingSeconds)
   const dailyBonusButtonLabel = isClaimingDaily
@@ -396,6 +401,18 @@ export function Video() {
       }) as CSSProperties,
     [height, width],
   )
+
+  const replaceDisplayVideo = useCallback((next: PreparedGeneratedAsset | null) => {
+    const previous = displayVideoRef.current
+    if (previous && previous !== next) previous.release()
+    displayVideoRef.current = next
+    setDisplayVideo(next)
+  }, [])
+
+  useEffect(() => () => {
+    displayVideoRef.current?.release()
+    displayVideoRef.current = null
+  }, [])
 
   useEffect(() => {
     if (!supabase) {
@@ -777,7 +794,7 @@ export function Video() {
       runIdRef.current = runId
       setIsRunning(true)
       setStatusMessage('動画を生成中です…')
-      setDisplayVideo(null)
+      replaceDisplayVideo(null)
       let fallbackVideo: string | null = null
 
       try {
@@ -799,7 +816,15 @@ export function Video() {
           throw new Error('動画生成結果を取得できませんでした。')
         }
         fallbackVideo = baseVideo
-        setDisplayVideo(baseVideo)
+        const preparedVideo = await prepareGeneratedAsset({
+          source: baseVideo,
+          fallbackExtension: 'mp4',
+        })
+        if (runIdRef.current !== runId) {
+          preparedVideo.release()
+          return
+        }
+        replaceDisplayVideo(preparedVideo)
         setStatusMessage('動画生成が完了しました。')
 
         if (accessToken) {
@@ -810,7 +835,18 @@ export function Video() {
         const message = normalizeErrorMessage(error instanceof Error ? error.message : error)
         if (message !== 'TICKET_SHORTAGE') {
           if (fallbackVideo) {
-            setDisplayVideo(fallbackVideo)
+            if (!displayVideoRef.current) {
+              try {
+                const preparedFallback = await prepareGeneratedAsset({
+                  source: fallbackVideo,
+                  fallbackExtension: 'mp4',
+                })
+                if (runIdRef.current === runId) replaceDisplayVideo(preparedFallback)
+                else preparedFallback.release()
+              } catch {
+                // Keep the original generation error below.
+              }
+            }
             setStatusMessage(`一部処理でエラーが発生したため、途中結果を表示しています。${message}`)
           } else {
             setStatusMessage(message)
@@ -826,6 +862,7 @@ export function Video() {
       accessToken,
       fetchTickets,
       pollJob,
+      replaceDisplayVideo,
       session,
       submitVideo,
     ],
@@ -835,9 +872,9 @@ export function Video() {
     setSourcePreview(null)
     setSourcePayload(null)
     setSourceName('')
-    setDisplayVideo(null)
+    replaceDisplayVideo(null)
     setStatusMessage('')
-  }, [])
+  }, [replaceDisplayVideo])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -900,10 +937,12 @@ export function Video() {
     setIsSavingResult(true)
     try {
       await saveGeneratedAsset({
-        source: displayVideo,
+        source: displayVideo.url,
         filenamePrefix: 'meltai-h-video',
-        fallbackExtension: isGif ? 'gif' : 'mp4',
+        fallbackExtension: displayVideo.extension || (isGif ? 'gif' : 'mp4'),
       })
+    } catch {
+      setErrorModalMessage('動画の保存に失敗しました。ブラウザのダウンロード許可を確認して、もう一度お試しください。')
     } finally {
       setIsSavingResult(false)
     }
@@ -1138,7 +1177,7 @@ export function Video() {
                 >
                   {isSavingResult ? 'Saving...' : 'Save'}
                 </button>
-                {isGif ? <img src={displayVideo} alt="Generated video" /> : <video controls src={displayVideo} />}
+                {isGif ? <img src={displayVideo.url} alt="Generated video" /> : <video controls src={displayVideo.url} />}
               </div>
             ) : sourcePreview ? (
               <img src={sourcePreview} alt="入力画像" />

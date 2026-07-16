@@ -10,7 +10,11 @@ import {
 import type { Session } from '@supabase/supabase-js'
 import { Link } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
-import { saveGeneratedAsset } from '../lib/downloadMedia'
+import {
+  prepareGeneratedAsset,
+  saveGeneratedAsset,
+  type PreparedGeneratedAsset,
+} from '../lib/downloadMedia'
 import { isAuthConfigured, supabase } from '../lib/supabaseClient'
 import './video-studio.css'
 
@@ -184,12 +188,13 @@ export function FluxTurboTest() {
   const [negativePrompt, setNegativePrompt] = useState('')
   const [generationSteps, setGenerationSteps] = useState<4 | 8>(DEFAULT_STEPS)
   const [cfgScale, setCfgScale] = useState(DEFAULT_CFG)
-  const [resultImage, setResultImage] = useState<string | null>(null)
+  const [resultImage, setResultImage] = useState<PreparedGeneratedAsset | null>(null)
   const [statusMessage, setStatusMessage] = useState('')
   const [ticketCount, setTicketCount] = useState<number | null>(null)
   const [isRunning, setIsRunning] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const runIdRef = useRef(0)
+  const resultImageRef = useRef<PreparedGeneratedAsset | null>(null)
 
   const accessToken = session?.access_token ?? ''
   const ticketCost = generationSteps >= 8 ? 2 : 1
@@ -201,6 +206,18 @@ export function FluxTurboTest() {
       }) as CSSProperties,
     [source?.height, source?.width],
   )
+
+  const replaceResultImage = useCallback((next: PreparedGeneratedAsset | null) => {
+    const previous = resultImageRef.current
+    if (previous && previous !== next) previous.release()
+    resultImageRef.current = next
+    setResultImage(next)
+  }, [])
+
+  useEffect(() => () => {
+    resultImageRef.current?.release()
+    resultImageRef.current = null
+  }, [])
 
   useEffect(() => {
     if (!supabase) {
@@ -302,7 +319,7 @@ export function FluxTurboTest() {
     try {
       const prepared = await prepareImageFile(file)
       setSource(prepared)
-      setResultImage(null)
+      replaceResultImage(null)
       setStatusMessage('元画像を読み込みました。')
     } catch (error) {
       setStatusMessage(normalizeError(error))
@@ -398,7 +415,7 @@ export function FluxTurboTest() {
     const runId = runIdRef.current + 1
     runIdRef.current = runId
     setIsRunning(true)
-    setResultImage(null)
+    replaceResultImage(null)
     setStatusMessage('I2Iで画像編集を実行中です。')
 
     try {
@@ -412,7 +429,15 @@ export function FluxTurboTest() {
             : []
       if (runIdRef.current !== runId) return
       if (!images.length) throw new Error('生成結果を取得できませんでした。')
-      setResultImage(images[0])
+      const preparedImage = await prepareGeneratedAsset({
+        source: images[0],
+        fallbackExtension: 'png',
+      })
+      if (runIdRef.current !== runId) {
+        preparedImage.release()
+        return
+      }
+      replaceResultImage(preparedImage)
       setStatusMessage('生成が完了しました。')
       void refreshTickets()
     } catch (error) {
@@ -428,7 +453,13 @@ export function FluxTurboTest() {
     if (!resultImage || isSaving) return
     setIsSaving(true)
     try {
-      await saveGeneratedAsset({ source: resultImage, filenamePrefix: 'melteichi-i2i', fallbackExtension: 'png' })
+      await saveGeneratedAsset({
+        source: resultImage.url,
+        filenamePrefix: 'melteichi-i2i',
+        fallbackExtension: resultImage.extension || 'png',
+      })
+    } catch {
+      setStatusMessage('画像の保存に失敗しました。ブラウザのダウンロード許可を確認してください。')
     } finally {
       setIsSaving(false)
     }
@@ -632,7 +663,7 @@ export function FluxTurboTest() {
               </div>
             ) : resultImage ? (
               <>
-                <img className="studio-result-media" src={resultImage} alt="生成結果" />
+                <img className="studio-result-media" src={resultImage.url} alt="生成結果" />
                 <button type="button" className="studio-save-btn" onClick={handleSave} disabled={isSaving}>
                   {isSaving ? '保存中' : '保存'}
                 </button>
