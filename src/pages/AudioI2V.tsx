@@ -711,7 +711,6 @@ export function AudioI2V() {
                 value={prompt}
                 maxLength={MAX_PROMPT_LENGTH}
                 onChange={(e) => setPrompt(e.target.value.slice(0, MAX_PROMPT_LENGTH))}
-                placeholder="例: 女性がペンを咥え、カメラがゆっくり寄る"
               />
             </label>
 
@@ -755,7 +754,6 @@ export function AudioI2V() {
                 value={negativePrompt}
                 maxLength={MAX_PROMPT_LENGTH}
                 onChange={(e) => setNegativePrompt(e.target.value.slice(0, MAX_PROMPT_LENGTH))}
-                placeholder="崩れ、ノイズ、低品質"
               />
             </label>
           </section>
