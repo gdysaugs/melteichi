@@ -153,7 +153,7 @@ const VIDEO_DURATION_OPTIONS_DASIWA = [
 ] as const
 const VIDEO_DURATION_OPTIONS_LORA_PACK = [
   { seconds: 5, frames: 53, ticketCost: 1 },
-  { seconds: 8, frames: 81, ticketCost: 3 },
+  { seconds: 8, frames: 81, ticketCost: 2 },
 ] as const
 const FIXED_ANIMATE_FRAMES = 77
 const INTERNAL_SERVER_ERROR_MESSAGE = '\u30b5\u30fc\u30d0\u30fc\u5185\u90e8\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\u6642\u9593\u3092\u304a\u3044\u3066\u518d\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002'

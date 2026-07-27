@@ -16,6 +16,7 @@ import {
   type PreparedGeneratedAsset,
 } from '../lib/downloadMedia'
 import { TopNav } from '../components/TopNav'
+import { VideoEngineCards } from '../components/VideoEngineCards'
 import './camera.css'
 import './video-studio.css'
 
@@ -58,7 +59,7 @@ const FIXED_CFG = 1
 const FIXED_FPS = 10
 const VIDEO_LENGTH_OPTIONS = [
   { seconds: 5, frames: 53, ticketCost: 1, label: '5秒 / 1 Gem' },
-  { seconds: 8, frames: 81, ticketCost: 3, label: '8秒 / 3 Gem' },
+  { seconds: 8, frames: 81, ticketCost: 2, label: '8秒 / 2 Gem' },
 ] as const
 const DEFAULT_VIDEO_LENGTH_SECONDS = VIDEO_LENGTH_OPTIONS[0].seconds
 const EXTENDED_VIDEO_LENGTH_SECONDS = VIDEO_LENGTH_OPTIONS[1].seconds
@@ -961,6 +962,7 @@ export function Video() {
     <div className="studio-page">
       <TopNav />
       <main className="studio-wrap">
+        <VideoEngineCards activeEngine="a" disabled={isRunning} />
         <section className="studio-panel studio-panel--controls">
           <header className="studio-heading">
             <h1>動画生成エリア</h1>
