@@ -202,6 +202,41 @@ body {
   box-shadow: 0 10px 22px rgba(2, 6, 14, 0.28);
 }
 
+.top-nav__account-label {
+  display: inline;
+}
+
+.top-nav__hamburger {
+  display: none;
+  width: 20px;
+  height: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.top-nav__hamburger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.top-nav__account-button.is-open .top-nav__hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.top-nav__account-button.is-open .top-nav__hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.top-nav__account-button.is-open .top-nav__hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .top-nav__account-button:hover,
 .top-nav__account-button.is-open {
   transform: translateY(-1px);
@@ -2130,6 +2165,32 @@ body {
   .top-nav__account-button,
   .top-nav__auth-button {
     min-height: 42px;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-nav__account-button {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0;
+    border-radius: 12px;
+  }
+
+  .top-nav__account-label {
+    display: none;
+  }
+
+  .top-nav__hamburger {
+    display: inline-flex;
+  }
+
+  .top-nav__account-menu {
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(280px, calc(100vw - 24px));
+    min-width: 0;
   }
 }
 

@@ -110,14 +110,23 @@ export function TopNav() {
             onClick={() => setIsAccountOpen((current) => !current)}
             aria-expanded={isAccountOpen}
             aria-haspopup='menu'
+            aria-label={isAccountOpen ? 'Close menu' : 'Open menu'}
           >
-            Account
+            <span className='top-nav__account-label'>Account</span>
+            <span className='top-nav__hamburger' aria-hidden='true'>
+              <span className='top-nav__hamburger-line' />
+              <span className='top-nav__hamburger-line' />
+              <span className='top-nav__hamburger-line' />
+            </span>
           </button>
           {isAccountOpen ? (
             <div className='top-nav__account-menu' role='menu'>
               {userEmail ? <p className='top-nav__account-email'>{userEmail}</p> : null}
               <NavLink className='top-nav__account-link' to='/purchase' onClick={() => setIsAccountOpen(false)}>
                 Purchase
+              </NavLink>
+              <NavLink className='top-nav__account-link' to='/video' onClick={() => setIsAccountOpen(false)}>
+                I2V
               </NavLink>
               <NavLink className='top-nav__account-link' to='/i2i' onClick={() => setIsAccountOpen(false)}>
                 I2I
